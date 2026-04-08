@@ -7,6 +7,7 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
+import { useTheme } from '../../theme/ThemeContext';
 
 interface CustomButtonProps {
   title: string;
@@ -27,25 +28,40 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   style,
   textStyle,
 }) => {
+  const { colors } = useTheme();
   const getButtonStyle = () => {
     switch (type) {
       case 'secondary':
-        return styles.secondaryButton;
+        return {
+          backgroundColor: '#fff',
+          borderWidth: 1,
+          borderColor: colors.primary,
+        };
       case 'danger':
-        return styles.dangerButton;
+        return {
+          backgroundColor: colors.error,
+        };
       default:
-        return styles.primaryButton;
+        return {
+          backgroundColor: colors.primary,
+        };
     }
   };
 
   const getTextStyle = () => {
     switch (type) {
       case 'secondary':
-        return styles.secondaryText;
+        return {
+          color: colors.primary,
+        };
       case 'danger':
-        return styles.dangerText;
+        return {
+          color: '#fff',
+        };
       default:
-        return styles.primaryText;
+        return {
+          color: '#fff',
+        };
     }
   };
 
@@ -80,32 +96,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 48,
   },
-  primaryButton: {
-    backgroundColor: '#1976d2',
-  },
-  secondaryButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#1976d2',
-  },
-  dangerButton: {
-    backgroundColor: '#f44336',
-  },
   disabledButton: {
     opacity: 0.6,
   },
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  primaryText: {
-    color: '#fff',
-  },
-  secondaryText: {
-    color: '#1976d2',
-  },
-  dangerText: {
-    color: '#fff',
   },
 });
 

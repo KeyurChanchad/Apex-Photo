@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Pressable,
 } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { ThemedView } from '../../components/common/ThemedView';
@@ -16,6 +17,7 @@ import Toast from 'react-native-toast-message';
 interface OTPVerificationScreenProps {
   route: {
     params: {
+      countryCode: string;
       mobileNumber: string;
       refId: string;
     };
@@ -28,8 +30,8 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
   navigation,
 }) => {
   const { colors } = useTheme();
-  const { verifyOTP, resendOTP, loading } = useAuth();
-  const { mobileNumber, refId } = route.params;
+  const { verifyOTP, verifyMobileNo, loading } = useAuth();
+  const { countryCode, mobileNumber, refId } = route.params;
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
@@ -90,7 +92,7 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
         position: 'top',
         visibilityTime: 3000,
       });
-      navigation.replace('JoinEvent');
+      navigation.replace('Main', { name: 'EventList' });
     } catch (error: any) {
       Alert.alert('Verification Failed', error.message);
     }
@@ -98,12 +100,24 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
 
   const handleResend = async () => {
     try {
-      await resendOTP(mobileNumber);
+      await verifyMobileNo(countryCode, mobileNumber);
       setTimer(60);
       setCanResend(false);
-      Alert.alert('Success', 'OTP resent successfully');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'OTP resent successfully',
+        position: 'top',
+        visibilityTime: 3000,
+      });
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.message,
+        position: 'top',
+        visibilityTime: 3000,
+      });
     }
   };
 
@@ -148,18 +162,34 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
           loading={loading}
         />
 
-        <View style={styles.resendContainer}>
-          {!canResend ? (
-            <ThemedText variant="body1">
-              Resend code in {timer} seconds
-            </ThemedText>
-          ) : (
-            <TouchableOpacity onPress={handleResend}>
-              <ThemedText style={{ color: colors.primary }}>
-                Resend Code
+        {/* OR Divider */}
+        <View style={styles.orContainer}>
+          <View style={styles.orLine} />
+          <ThemedText style={styles.orText}>OR</ThemedText>
+          <View style={styles.orLine} />
+        </View>
+
+        <View style={styles.actionContainer}>
+          <Pressable
+            onPress={() => {
+              navigation.goBack();
+            }}
+          >
+            <ThemedText color={'secondary'}>Change Number</ThemedText>
+          </Pressable>
+          <View style={styles.resendContainer}>
+            {!canResend ? (
+              <ThemedText variant="body1" weight="bold">
+                Resend code in {timer} seconds
               </ThemedText>
-            </TouchableOpacity>
-          )}
+            ) : (
+              <TouchableOpacity onPress={handleResend}>
+                <ThemedText style={{ color: colors.primary }}>
+                  Resend Code
+                </ThemedText>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
     </ThemedView>
@@ -194,8 +224,28 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
   },
+  actionContainer: {
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   resendContainer: {
     alignItems: 'center',
-    marginTop: 16,
+  },
+  orContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  orLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E0E0E0',
+  },
+  orText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    color: '#999999',
   },
 });

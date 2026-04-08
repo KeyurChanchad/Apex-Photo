@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import MaterialIcon from '@react-native-vector-icons/material-icons';
 import { useTheme } from '../theme/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,67 +12,12 @@ import { OTPVerificationScreen } from '../screens/auth/OTPVerificationScreen';
 import { SplashScreen } from '../screens/common/SplashScreen';
 import PhotoGalleryScreen from '../screens/photos/PhotoGalleryScreen';
 import UploadPhotoScreen from '../screens/photos/UploadPhotoScreen';
-import PhotoDetailScreen from '../screens/photos/PhotoDetailScreen';
-import { MainTabParamList } from './types';
+import EventListScreen from '../screens/common/EventListScreen';
 
-const Tab = createMaterialTopTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator();
 
-const TabNavigator = () => {
-  const { colors, isDarkMode, typography } = useTheme();
-
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color }) => {
-          let iconName;
-          if (route.name === 'AllPhotos') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'UploadPhoto') {
-            iconName = focused ? 'person' : 'person-outline';
-          } else if (route.name === 'PhotoDetail') {
-            iconName = focused ? 'settings' : 'settings-outline';
-          }
-          return <MaterialIcon name={iconName || 'apps'} color={color} />;
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.tabBar,
-          borderTopColor: colors.border,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
-        },
-        tabBarLabelStyle: {
-          fontSize: typography.sizes.sm,
-          fontWeight: typography.weights.medium,
-          fontFamily: typography.families.medium,
-        },
-        headerStyle: {
-          backgroundColor: colors.header,
-          shadowColor: colors.shadow,
-          shadowOpacity: isDarkMode ? 0.3 : 0.1,
-          elevation: 0,
-        },
-        headerTitleStyle: {
-          color: colors.headerTitle,
-          fontSize: typography.sizes.lg,
-          fontWeight: typography.weights.semibold,
-          fontFamily: typography.families.semibold,
-        },
-        headerTintColor: colors.primary,
-      })}
-    >
-      <Tab.Screen name="AllPhotos" component={PhotoGalleryScreen} />
-      <Tab.Screen name="UploadPhoto" component={UploadPhotoScreen} />
-      {/* <Tab.Screen name="PhotoDetail" component={PhotoDetailScreen} /> */}
-    </Tab.Navigator>
-  );
-};
-
 const MainStackNavigator = () => {
-  const { colors, isDarkMode, typography } = useTheme();
+  const { colors, typography } = useTheme();
 
   return (
     <Stack.Navigator
@@ -95,13 +38,25 @@ const MainStackNavigator = () => {
       }}
     >
       <Stack.Screen
-        name="JoinEvent"
-        component={JoinEventScreen}
+        name="EventList"
+        component={EventListScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="MainTabs"
-        component={TabNavigator}
+        name="JoinEvent"
+        component={JoinEventScreen}
+        options={{
+          headerTitle: '',
+        }}
+      />
+      <Stack.Screen
+        name="PhotoGallery"
+        component={PhotoGalleryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="UploadPhoto"
+        component={UploadPhotoScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

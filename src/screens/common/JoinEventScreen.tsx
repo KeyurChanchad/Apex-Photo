@@ -5,10 +5,8 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
   Alert,
-  Linking,
-  Platform,
+  Pressable,
 } from 'react-native';
 import { ThemedText } from '../../components/common/ThemedText';
 import CustomButton from '../../components/common/CustomButton';
@@ -19,11 +17,14 @@ import {
 } from 'react-native-vision-camera';
 import { usePermission } from '../../hooks/usePermission';
 import Toast from 'react-native-toast-message';
-import api from '../../services/api';
+import { useTheme } from '../../theme/ThemeContext';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { launchImageLibrary, PhotoQuality } from 'react-native-image-picker';
 
 export const JoinEventScreen: React.FC<{ navigation: any }> = ({
   navigation,
 }) => {
+  const { colors } = useTheme();
   const [eventCode, setEventCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(
@@ -56,9 +57,7 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
         const scannedCode = codes[0].value;
         setIsScanning(false);
         setEventCode(scannedCode);
-        Alert.alert('QR Code Scanned', `Code: ${scannedCode}`, [
-          { text: 'OK', onPress: () => handleJoinEvent(scannedCode) },
-        ]);
+        handleJoinEvent(scannedCode);
       }
     },
   });
@@ -71,16 +70,97 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
     }
   };
 
+  const handleUploadQRImage = () => {
+    const options = {
+      selectionLimit: 1,
+      mediaType: 'photo' as const,
+      includeBase64: false,
+      quality: 1 as PhotoQuality,
+    };
+
+    launchImageLibrary(options, async response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.errorCode) {
+        console.log('ImagePicker Error: ', response.errorMessage);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to pick image',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+      } else if (response.assets && response.assets[0]?.uri) {
+        const imageUri = response.assets[0].uri;
+
+        try {
+          setIsLoading(true);
+
+          // Decode QR code from image
+          // You'll need to install: npm install react-native-qrcode-scanner
+          // Or use a QR code decoding library like: react-native-qrcode-local-image
+
+          // For now, we'll use a placeholder QR decoder
+          // Replace this with actual QR decoding logic
+          const qrCode = await decodeQRCodeFromImage(imageUri);
+
+          if (qrCode) {
+            setEventCode(qrCode);
+            handleJoinEvent(qrCode);
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: 'Error',
+              text2: 'No QR code found in the selected image',
+              position: 'top',
+              visibilityTime: 3000,
+            });
+          }
+        } catch (error) {
+          console.error('QR decode error:', error);
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Failed to read QR code from image',
+            position: 'top',
+            visibilityTime: 3000,
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    });
+  };
+
+  // Helper function to decode QR code from image
+  // You need to implement this based on your QR code library
+  const decodeQRCodeFromImage = async (
+    imageUri: string,
+  ): Promise<string | null> => {
+    // Option 1: Using react-native-qrcode-scanner
+    // Option 2: Using react-native-qrcode-local-image
+    // Option 3: Send to your backend API for decoding
+
+    // For demonstration, we'll simulate a QR code decode
+    // Replace this with actual implementation
+    return new Promise(resolve => {
+      setTimeout(() => {
+        // Mock QR code value
+        resolve('EVT2024');
+      }, 1000);
+    });
+  };
+
   const handleJoinEvent = async (code?: string) => {
     const joinCode = code || eventCode;
 
     setIsLoading(true);
     // Simulate API call
     try {
-      const response = await api.post('/EventShareApi/ValidateShareToken', {
-        shareToken: joinCode,
-      });
-      console.log('RESPONSE OF JOINT EVENT ', response.data);
+      // const response = await api.post('/EventShareApi/ValidateShareToken', {
+      //   shareToken: joinCode,
+      // });
+      // console.log('RESPONSE OF JOINT EVENT ', response.data);
       // if (response.data.statusCode !== 200) {
       //   Toast.show({
       //     type: 'error',
@@ -99,12 +179,7 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
         visibilityTime: 3000,
       });
       // Navigate to event screen here
-      navigation.navigate('Main', {
-        screen: 'MainTabs',
-        params: {
-          screen: 'AllPhotos',
-        },
-      });
+      navigation.navigate('PhotoGallery');
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -123,13 +198,13 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
     return (
       <View style={styles.scannerContainer}>
         <View style={styles.scannerHeader}>
+          <ThemedText style={styles.scannerTitle}>Scanning QR Code</ThemedText>
           <TouchableOpacity
             onPress={() => setIsScanning(false)}
             style={styles.closeButton}
           >
-            <ThemedText style={styles.closeText}>✕</ThemedText>
+            <MaterialIcons name="close" size={20} style={styles.closeText} />
           </TouchableOpacity>
-          <ThemedText style={styles.scannerTitle}>Scan QR Code</ThemedText>
         </View>
         {device ? (
           <Camera
@@ -169,12 +244,38 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
           <ThemedText style={styles.subtitle}>Enter code or scan QR</ThemedText>
         </View>
 
-        {/* QR Scan Card */}
+        {/* Main QR Scan Card */}
         <TouchableOpacity style={styles.scanCard} onPress={handleScanPress}>
           <View style={styles.qrIconContainer}>
-            <ThemedText style={styles.qrIcon}>📷</ThemedText>
+            <MaterialIcons
+              name="qr-code-scanner"
+              size={36}
+              color={colors.primary}
+            />
           </View>
-          <ThemedText style={styles.scanText}>Tap to scan QR code</ThemedText>
+          <ThemedText style={styles.scanTitle}>Scan QR Code</ThemedText>
+          <ThemedText
+            variant="body2"
+            style={styles.scanDescription}
+            color="secondary"
+          >
+            Point your camera at the QR code
+          </ThemedText>
+        </TouchableOpacity>
+
+        {/* Secondary Upload Option */}
+        <TouchableOpacity
+          style={styles.uploadButton}
+          onPress={handleUploadQRImage}
+        >
+          <MaterialIcons
+            name="photo-library"
+            size={22}
+            color={colors.textSecondary}
+          />
+          <ThemedText variant="body1" style={styles.uploadButtonText}>
+            Upload QR code from gallery
+          </ThemedText>
         </TouchableOpacity>
 
         {/* OR Divider */}
@@ -186,11 +287,20 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
 
         {/* Event Code Input */}
         <View style={styles.inputContainer}>
-          <ThemedText style={styles.inputLabel}>EVENT CODE</ThemedText>
+          <View style={styles.labelContainer}>
+            <ThemedText style={styles.inputLabel}>Enter Event Code</ThemedText>
+          </View>
           <TextInput
-            style={styles.input}
-            placeholder="e.g. EVT2024"
-            placeholderTextColor="#999"
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.backgroundSecondary,
+                color: colors.text,
+                borderColor: colors.border,
+              },
+            ]}
+            placeholder="e.g., EVT2024 or ABC123"
+            placeholderTextColor={colors.textSecondary}
             value={eventCode}
             onChangeText={setEventCode}
             autoCapitalize="characters"
@@ -201,7 +311,7 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
         {/* Join Button */}
         <CustomButton
           onPress={() => handleJoinEvent()}
-          title={isLoading ? 'Joining...' : 'Join Event →'}
+          title={isLoading ? 'Joining...' : 'Join Event'}
           loading={isLoading}
           type="primary"
           style={styles.joinButton}
@@ -215,87 +325,97 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 40,
   },
   header: {
-    marginBottom: 40,
+    marginBottom: 32,
   },
   title: {
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: '700',
-    color: '#1A1A1A',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#666666',
   },
   scanCard: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 20,
-    paddingVertical: 32,
+    borderRadius: 24,
+    paddingVertical: 40,
     alignItems: 'center',
-    marginBottom: 24,
-    borderWidth: 1,
+    marginBottom: 16,
+    borderWidth: 1.5,
     borderColor: '#E8E8E8',
-    borderStyle: 'dashed',
   },
   qrIconContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#E8E8E8',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#F0F0F0',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  qrIcon: {
-    fontSize: 36,
+  scanTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
   },
-  scanText: {
+  scanDescription: {
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  uploadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    marginBottom: 24,
+    gap: 8,
+  },
+  uploadButtonText: {
     fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '500',
   },
   orContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 24,
+    marginBottom: 24,
   },
   orLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#E8E8E8',
   },
   orText: {
     marginHorizontal: 16,
-    fontSize: 14,
+    fontSize: 13,
     color: '#999999',
+    fontWeight: '500',
   },
   inputContainer: {
-    marginBottom: 32,
+    marginBottom: 24,
+  },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
   },
   inputLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666666',
-    marginBottom: 8,
     letterSpacing: 1,
   },
   input: {
     height: 52,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#FFFFFF',
-    color: '#1A1A1A',
   },
   joinButton: {
     marginTop: 8,
@@ -303,12 +423,11 @@ const styles = StyleSheet.create({
   // Scanner styles
   scannerContainer: {
     flex: 1,
-    backgroundColor: '#000000',
   },
   scannerHeader: {
     position: 'absolute',
-    top: 50,
-    left: 20,
+    top: 20,
+    left: 30,
     right: 20,
     zIndex: 10,
     flexDirection: 'row',
@@ -333,7 +452,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#FFFFFF',
-    marginRight: 40,
   },
   scannerOverlay: {
     ...StyleSheet.absoluteFillObject,

@@ -14,7 +14,7 @@ import { ThemedText } from '../../components/common/ThemedText';
 import { useTheme } from '../../theme/ThemeContext';
 import Toast from 'react-native-toast-message';
 import { CountryPicker } from 'react-native-country-codes-picker';
-import { useDeviceInfo } from '../../hooks/useDeviceInfo';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 export const LoginScreen: React.FC = ({ navigation }: any) => {
   const { colors } = useTheme();
@@ -74,8 +74,9 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
 
       // Navigate to OTP verification screen
       navigation.navigate('OTPVerification', {
-        mobileNumber: mobileNumber,
-        refId: refId,
+        countryCode,
+        mobileNumber,
+        refId,
       });
     } catch (err: any) {
       Toast.show({
@@ -190,11 +191,27 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
               onPress={handleSendOTP}
               disabled={disabledBtn || loginLoading}
             >
-              {loginLoading ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <ThemedText style={styles.buttonText}>Send OTP</ThemedText>
-              )}
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 10,
+                  alignItems: 'center',
+                }}
+              >
+                {loginLoading ? (
+                  <ActivityIndicator color={colors.text} />
+                ) : (
+                  <MaterialIcons
+                    name="send"
+                    size={20}
+                    color={colors.textInverse || '#FFFFFF'}
+                  />
+                )}
+                <ThemedText style={styles.buttonText}>
+                  {loginLoading ? 'Sending...' : 'Send OTP'}
+                </ThemedText>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -232,13 +249,28 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
         style={{
           modal: {
             height: '80%',
+            backgroundColor: colors.backgroundSecondary,
+          },
+          searchMessageText: {
+            color: colors.text,
+            backgroundColor: colors.background,
           },
           countryButtonStyles: {
-            backgroundColor: colors.surface,
+            backgroundColor: colors.background,
+            alignItems: 'flex-start',
           },
           textInput: {
+            backgroundColor: colors.background,
             color: colors.text,
           },
+          countryName: {
+            color: colors.text,
+          },
+          dialCode: { color: colors.text },
+          countryMessageContainer: {
+            backgroundColor: colors.background,
+          },
+          modalInner: { backgroundColor: 'red' },
         }}
       />
     </ThemedView>
