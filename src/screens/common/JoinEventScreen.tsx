@@ -312,6 +312,7 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
         <CustomButton
           onPress={() => handleJoinEvent()}
           title={isLoading ? 'Joining...' : 'Join Event'}
+          rightIcon="arrow-right-alt"
           loading={isLoading}
           type="primary"
           style={styles.joinButton}

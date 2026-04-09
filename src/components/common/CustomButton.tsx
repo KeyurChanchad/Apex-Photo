@@ -6,8 +6,10 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  View,
 } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
 
 interface CustomButtonProps {
   title: string;
@@ -17,6 +19,8 @@ interface CustomButtonProps {
   type?: 'primary' | 'secondary' | 'danger';
   style?: ViewStyle;
   textStyle?: TextStyle;
+  leftIcon?: string;
+  rightIcon?: string;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -27,13 +31,15 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   type = 'primary',
   style,
   textStyle,
+  leftIcon,
+  rightIcon,
 }) => {
   const { colors } = useTheme();
   const getButtonStyle = () => {
     switch (type) {
       case 'secondary':
         return {
-          backgroundColor: '#fff',
+          backgroundColor: colors.white,
           borderWidth: 1,
           borderColor: colors.primary,
         };
@@ -56,11 +62,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         };
       case 'danger':
         return {
-          color: '#fff',
+          color: colors.white,
         };
       default:
         return {
-          color: '#fff',
+          color: colors.white,
         };
     }
   };
@@ -79,9 +85,27 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       {loading ? (
         <ActivityIndicator color="#fff" />
       ) : (
-        <Text style={[styles.buttonText, getTextStyle(), textStyle]}>
-          {title}
-        </Text>
+        <View style={styles.row}>
+          {leftIcon && (
+            <MaterialIcons
+              name={leftIcon || 'arrow-left'}
+              size={26}
+              color={colors.white}
+              style={{ marginRight: 2 }}
+            />
+          )}
+          <Text style={[styles.buttonText, getTextStyle(), textStyle]}>
+            {title}
+          </Text>
+          {rightIcon && (
+            <MaterialIcons
+              name={rightIcon || 'arrow-right-alt'}
+              size={26}
+              color={colors.white}
+              style={{ marginLeft: 2 }}
+            />
+          )}
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -102,6 +126,9 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  row: {
+    flexDirection: 'row',
   },
 });
 

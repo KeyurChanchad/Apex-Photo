@@ -206,17 +206,8 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
           onPress={handleJoinNewEvent}
           activeOpacity={0.8}
         >
-          <MaterialIcons
-            name="add-circle"
-            size={20}
-            color={colors.textInverse}
-          />
-          <Text
-            style={[
-              styles.joinButtonText,
-              { color: colors.textInverse || '#FFFFFF' },
-            ]}
-          >
+          <MaterialIcons name="add-circle" size={20} color={colors.white} />
+          <Text style={[styles.joinButtonText, { color: colors.white }]}>
             Join New Event
           </Text>
         </TouchableOpacity>

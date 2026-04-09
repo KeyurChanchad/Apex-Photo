@@ -58,6 +58,9 @@ export const lightColors = {
   // Header
   header: '#FFFFFF',
   headerTitle: '#000000',
+
+  white: '#FFFFFF',
+  black: '#000000',
 };
 
 export const darkColors = {
@@ -120,4 +123,7 @@ export const darkColors = {
   // Header
   header: '#1C1C1E',
   headerTitle: '#FFFFFF',
+
+  white: '#FFFFFF',
+  black: '#000000',
 };
