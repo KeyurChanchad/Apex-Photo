@@ -1,28 +1,24 @@
-import React from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import React, { FC } from 'react';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { ThemedText } from '../../components/common/ThemedText';
 import CustomButton from '../../components/common/CustomButton';
 import { useTheme } from '../../theme/ThemeContext';
-import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
-const NoMatchFoundScreen = () => {
+const NoMatchFoundScreen: FC<{
+  route: any;
+}> = ({ route }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  console.log(route.params);
+  const { onTry, onBackGallery } = route.params;
 
   const handleTryAgain = () => {
-    navigation?.goBack();
+    if (onTry) onTry();
   };
 
   const handleBackToGallery = () => {
-    navigation?.goBack();
+    if (onBackGallery) onBackGallery();
   };
 
   return (
@@ -60,6 +56,7 @@ const NoMatchFoundScreen = () => {
             title="Try Again"
             type="primary"
             style={styles.tryAgainButton}
+            leftIcon="refresh"
           />
 
           <CustomButton

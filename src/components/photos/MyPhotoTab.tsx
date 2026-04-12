@@ -146,12 +146,14 @@ export const FaceTabScreen: React.FC<{
       });
     } catch (error) {
       console.error('Error finding faces:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to find photos. Please try again.',
-        position: 'top',
-        visibilityTime: 3000,
+      navigation.navigate('NoMatchFound', {
+        onTry: () => {
+          setSelfie(null);
+          navigation.goBack();
+        },
+        onBackGallery: () => {
+          navigation.replace('PhotoGallery  ');
+        },
       });
     } finally {
       setIsLoading(false);
@@ -215,8 +217,6 @@ export const FaceTabScreen: React.FC<{
       </View>
     );
   }
-
-  console.log('selfie url ', selfie);
 
   // Main UI - Selfie preview and action buttons
   return (
@@ -366,7 +366,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   captureButtonOption: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -374,9 +373,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     gap: 8,
+    width: '50%',
   },
   uploadButtonOption: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -384,6 +383,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     gap: 8,
+    width: '50%',
   },
   buttonOptionText: {
     color: '#FFFFFF',

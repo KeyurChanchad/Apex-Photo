@@ -38,7 +38,7 @@ export interface VerifyOTPData {
 
 export type VerifyOTPResponse = ApiResponse<VerifyOTPData>;
 
-export type EventStatusType = 'ACTIVE' | 'COMPLETED' | 'INACTIVE' | 'UPCOMING';
+export type EventStatusType = 'ACTIVE' | 'CLOSED' | 'INACTIVE' | 'UPCOMING';
 
 export interface EventItemType {
   id: string;

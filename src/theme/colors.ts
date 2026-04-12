@@ -1,6 +1,6 @@
 export const lightColors = {
   // Primary colors
-  primary: '#ED1A3C',
+  primary: '#BE1838', //#BE1838
   primaryLight: '#F24E68',
   primaryDark: '#B8142F',
 
@@ -90,7 +90,7 @@ export const darkColors = {
   error: '#FF453A',
   errorLight: '#3A2020',
   success: '#32D74B',
-  successLight: '#1E3A24',
+  successLight: '#E3F5E8',
   warning: '#FFD60A',
   warningLight: '#3A3520',
   info: '#64D2FF',

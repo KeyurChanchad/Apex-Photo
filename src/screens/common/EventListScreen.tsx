@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Pressable,
 } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { EventItemType, EventStatusType } from '../../types/common.types';
@@ -59,7 +60,7 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
           name: 'Hackathon',
           eventNumber: '345678',
           date: 'Mar 25, 2026',
-          status: 'COMPLETED',
+          status: 'CLOSED',
         },
       ]);
     } catch (error) {
@@ -89,20 +90,21 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
       case 'ACTIVE':
         return colors.success;
       case 'UPCOMING':
-        return colors.primary;
-      case 'COMPLETED':
         return colors.secondary;
+      case 'CLOSED':
+        return colors.primary;
       default:
         return colors.textSecondary;
     }
   };
 
   const renderEventCard = ({ item }: { item: EventItemType }) => (
-    <View
+    <Pressable
       style={[
         styles.eventCard,
         { backgroundColor: colors.background, shadowColor: colors.shadow },
       ]}
+      onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
     >
       <View style={styles.eventHeader}>
         <Text style={[styles.eventName, { color: colors.text }]}>
@@ -130,16 +132,22 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
           {item.date}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 
   const EmptyListComponent = () => (
     <View style={styles.emptyContainer}>
+      <MaterialIcons
+        name="event"
+        size={46}
+        color={colors.error}
+        style={{ paddingBottom: 14 }}
+      />
       <Text style={[styles.emptyText, { color: colors.text }]}>
         No events joined yet
       </Text>
       <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
-        Join your first event to get started!
+        Join an event using a code or QR scan to get started.
       </Text>
     </View>
   );
@@ -296,6 +304,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,

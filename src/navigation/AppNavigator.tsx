@@ -13,6 +13,8 @@ import { SplashScreen } from '../screens/common/SplashScreen';
 import PhotoGalleryScreen from '../screens/photos/PhotoGalleryScreen';
 import UploadPhotoScreen from '../screens/photos/UploadPhotoScreen';
 import EventListScreen from '../screens/common/EventListScreen';
+import NoMatchFoundScreen from '../components/common/NoMatchFound';
+import EventDetailScreen from '../screens/common/EventDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +59,16 @@ const MainStackNavigator = () => {
       <Stack.Screen
         name="UploadPhoto"
         component={UploadPhotoScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NoMatchFound"
+        component={NoMatchFoundScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EventDetail"
+        component={EventDetailScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

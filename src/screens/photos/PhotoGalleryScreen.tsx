@@ -1,5 +1,5 @@
 // screens/PhotoGalleryScreen.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import MaterialIcon from '@react-native-vector-icons/material-icons';
@@ -24,7 +24,13 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
   const { colors } = useTheme();
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
-  const [currentTab, setCurrentTab] = useState('all');
+  // const [currentTab, setCurrentTab] = useState('AllPhotos');
+
+  useEffect(() => {
+    if (route.params?.screen) {
+      navigation.navigate(route.params.screen);
+    }
+  }, [route.params]);
 
   const handlePhotoSelect = (photoId: string) => {
     if (selectedPhotos.includes(photoId)) {
@@ -180,15 +186,14 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
         }}
         screenListeners={{
           state: e => {
-            const { state } = e;
             const tabName =
-              state?.routes[state.index]?.name?.toLowerCase() || 'all';
-            setCurrentTab(tabName);
+              e.data.state?.routes[e.data.state.index]?.name || 'AllPhotos';
+            // setCurrentTab(tabName);
           },
         }}
       >
         <Tab.Screen
-          name="All Photos"
+          name="AllPhotos"
           options={{
             tabBarIcon: () => (
               <MaterialIcon
@@ -228,7 +233,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
           )}
         </Tab.Screen>
         <Tab.Screen
-          name="My Photos"
+          name="MyPhotos"
           options={{
             tabBarIcon: () => (
               <MaterialIcon name="person" size={24} color={colors.text} />

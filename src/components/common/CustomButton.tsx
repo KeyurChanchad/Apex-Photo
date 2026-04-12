@@ -7,6 +7,7 @@ import {
   ViewStyle,
   TextStyle,
   View,
+  StyleProp,
 } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
@@ -16,11 +17,12 @@ interface CustomButtonProps {
   onPress: () => void;
   loading?: boolean;
   disabled?: boolean;
-  type?: 'primary' | 'secondary' | 'danger';
-  style?: ViewStyle;
+  type?: 'primary' | 'secondary' | 'danger' | 'success';
+  style?: StyleProp<ViewStyle>;
   textStyle?: TextStyle;
   leftIcon?: string;
   rightIcon?: string;
+  iconColor?: TextStyle['color'];
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -33,6 +35,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   textStyle,
   leftIcon,
   rightIcon,
+  iconColor,
 }) => {
   const { colors } = useTheme();
   const getButtonStyle = () => {
@@ -43,9 +46,9 @@ const CustomButton: React.FC<CustomButtonProps> = ({
           borderWidth: 1,
           borderColor: colors.primary,
         };
-      case 'danger':
+      case 'success':
         return {
-          backgroundColor: colors.error,
+          backgroundColor: colors.success,
         };
       default:
         return {
@@ -90,7 +93,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
             <MaterialIcons
               name={leftIcon || 'arrow-left'}
               size={26}
-              color={colors.white}
+              color={iconColor || colors.text}
               style={{ marginRight: 2 }}
             />
           )}
@@ -101,7 +104,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
             <MaterialIcons
               name={rightIcon || 'arrow-right-alt'}
               size={26}
-              color={colors.white}
+              color={iconColor || colors.text}
               style={{ marginLeft: 2 }}
             />
           )}

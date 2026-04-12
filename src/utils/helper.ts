@@ -1,5 +1,6 @@
 import api from '../services/api';
 import { Photo } from '../types/photo.types';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 const decodeQRCodeFromImage = async (
   imageUri: string,
@@ -39,4 +40,8 @@ const generateMockPhotos = (count: number, eventId: string): Photo[] => {
   return photos;
 };
 
-export { decodeQRCodeFromImage, generateMockPhotos };
+const copyToClipboard = (text: string) => {
+  Clipboard.setString(text);
+};
+
+export { decodeQRCodeFromImage, generateMockPhotos, copyToClipboard };
