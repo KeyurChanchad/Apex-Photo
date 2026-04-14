@@ -1,6 +1,6 @@
 import RNFS from 'react-native-fs';
 import { Platform } from 'react-native';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import api from './api';
 import Toast from 'react-native-toast-message';
 
@@ -29,20 +29,31 @@ export const getUserPhotos = async () => {
 };
 
 // Function to get all photos by event ID
-export const getAllPhotos = async (eventId: string) => {
-  return api.get(`/photos/event/${eventId}`);
+export const getAllPhotos = async (
+  eventId: string,
+  page = 1,
+  pageSize = 20,
+) => {
+  const response = await api.get(
+    `/PortfolioEventApi/EventGallery?eventId=${eventId}&page=${page}&pageSize=${pageSize}`,
+  );
+  return response.data;
 };
 
 // Function to get faces by event ID - returns face-wise photos and count
-export const getFaces = async (eventId: string) => {
-  const response = await api.get(`/photos/event/${eventId}/faces`);
-  return response.data; // Expected format: { faces: [{ faceId: string, photos: [], count: number }] }
+export const getFaces = async (eventId: string, page = 1, pageSize = 20) => {
+  const response = await api.get(
+    `/PortfolioEventApi/EventFaces?eventId=${eventId}&page=${page}&pageSize=${pageSize}`,
+  );
+  return response.data;
 };
 
 // Function to get my photos by event ID
-export const getMyPhotos = async (eventId: string, photo?: any) => {
-  const params = photo ? { photo } : {};
-  return api.get(`/photos/event/${eventId}/my-photos`, { params });
+export const getMyPhotos = async (eventId: string, faceId: string) => {
+  const response = await api.get(
+    `/PortfolioEventApi/FacePhotos?eventId=${eventId}&faceId=${faceId}`,
+  );
+  return response.data;
 };
 
 // Function to upload photo
@@ -108,6 +119,8 @@ export const downloadMultiplePhotos = async (photoIds: string[]) => {
 
   try {
     const response = await api.post('/photos/download-multiple', { photoIds });
+    console.log('responseo of downlod mul ', response);
+
     Toast.show({
       type: 'success',
       text1: 'Download Started',
@@ -133,6 +146,8 @@ export const downloadAllPhotos = async () => {
 
   try {
     const response = await api.get('/photos/download-all');
+    console.log('responseo of downlod all ', response);
+
     Toast.show({
       type: 'success',
       text1: 'Download Started',

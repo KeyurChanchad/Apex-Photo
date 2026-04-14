@@ -38,12 +38,18 @@ export interface VerifyOTPData {
 
 export type VerifyOTPResponse = ApiResponse<VerifyOTPData>;
 
-export type EventStatusType = 'ACTIVE' | 'CLOSED' | 'INACTIVE' | 'UPCOMING';
+export type EventStatusType = 1 | 2 | 3 | 4;
 
 export interface EventItemType {
-  id: string;
-  name: string;
-  eventNumber: string;
-  date: string;
-  status: EventStatusType;
+  eventId: string;
+  eventName: string;
+  eventCode: string;
+  eventDate: string;
+  location: null;
+  eventStatus: EventStatusType;
+  eventUserId: string;
+  isMatched: boolean;
+  joinedDate: string;
 }
+
+export type UserEventsResponse = ApiResponse<EventItemType[]>;

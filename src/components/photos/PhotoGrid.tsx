@@ -6,7 +6,6 @@ import {
   View,
 } from 'react-native';
 import { Photo } from '../../types/photo.types';
-import { ThemedView } from '../common/ThemedView';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ThemedText } from '../common/ThemedText';
 import PhotoCard from './PhotoCard';
@@ -53,13 +52,13 @@ const PhotosGrid: React.FC<{
       renderItem={({ item }) => (
         <PhotoCard
           photo={item}
-          selected={selectedPhotos.includes(item.id)}
-          onSelect={() => onPhotoSelect(item.id)}
+          selected={selectedPhotos.includes(item.eventPhotoId)}
+          onSelect={() => onPhotoSelect(item.eventPhotoId)}
           selectionMode={selectionMode}
           onPress={() => onPhotoPress(item)}
         />
       )}
-      keyExtractor={item => item.id}
+      keyExtractor={item => item.eventPhotoId}
       numColumns={2}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

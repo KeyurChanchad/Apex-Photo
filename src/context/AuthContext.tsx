@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Store device ID for later use
       await AsyncStorage.setItem('deviceId', response.data.data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('Error to register device  ', error);
       const errorMessage =
         error.response?.data?.message || 'Login failed. Please try again.';
@@ -106,9 +106,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       console.log('response verify mobile ', response.data);
       return response.data.data.refId as string;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('Error to verify mobile ', error);
-
       const errorMessage =
         error.response?.data?.message || 'Login failed. Please try again.';
       setError(errorMessage);

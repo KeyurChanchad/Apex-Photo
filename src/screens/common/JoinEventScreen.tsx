@@ -1,12 +1,11 @@
 // screens/JoinEventScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
   TextInput,
   TouchableOpacity,
-  Alert,
-  Pressable,
+  ScrollView,
 } from 'react-native';
 import { ThemedText } from '../../components/common/ThemedText';
 import CustomButton from '../../components/common/CustomButton';
@@ -20,6 +19,9 @@ import Toast from 'react-native-toast-message';
 import { useTheme } from '../../theme/ThemeContext';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { launchImageLibrary, PhotoQuality } from 'react-native-image-picker';
+import api from '../../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export const JoinEventScreen: React.FC<{ navigation: any }> = ({
   navigation,
@@ -35,12 +37,7 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
   const { hasPermission, checkPermission, requestPermission } =
     usePermission('camera');
 
-  // Request camera permission on mount
-  useEffect(() => {
-    checkCameraPermission();
-  }, []);
-
-  const checkCameraPermission = async () => {
+  const checkCameraPermission = useCallback(async () => {
     await checkPermission();
     if (!hasPermission) {
       setCameraPermission(false);
@@ -48,7 +45,12 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
     } else {
       setCameraPermission(true);
     }
-  };
+  }, [hasPermission, checkPermission, requestPermission]);
+
+  // Request camera permission on mount
+  useEffect(() => {
+    checkCameraPermission();
+  }, [checkCameraPermission]);
 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'codabar'],
@@ -137,6 +139,8 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
   const decodeQRCodeFromImage = async (
     imageUri: string,
   ): Promise<string | null> => {
+    console.log('image uri ', imageUri);
+
     // Option 1: Using react-native-qrcode-scanner
     // Option 2: Using react-native-qrcode-local-image
     // Option 3: Send to your backend API for decoding
@@ -151,47 +155,54 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
     });
   };
 
-  const handleJoinEvent = async (code?: string) => {
-    const joinCode = code || eventCode;
-
-    setIsLoading(true);
-    // Simulate API call
-    try {
-      // const response = await api.post('/EventShareApi/ValidateShareToken', {
-      //   shareToken: joinCode,
-      // });
-      // console.log('RESPONSE OF JOINT EVENT ', response.data);
-      // if (response.data.statusCode !== 200) {
-      //   Toast.show({
-      //     type: 'error',
-      //     text1: 'Error',
-      //     text2: response.data.message,
-      //     position: 'top',
-      //     visibilityTime: 3000,
-      //   });
-      //   return;
-      // }
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: `Joining event with code: ${joinCode}`,
-        position: 'top',
-        visibilityTime: 3000,
-      });
-      // Navigate to event screen here
-      navigation.navigate('PhotoGallery');
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to join event. Please try again.',
-        position: 'top',
-        visibilityTime: 3000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleJoinEvent = useCallback(
+    async (code?: string) => {
+      const joinCode = code || eventCode;
+      setIsLoading(true);
+      try {
+        console.log('Join code being sent:', joinCode);
+        const response = await api.post('/PortfolioEventApi/JoinEvent', {
+          accessCode: joinCode,
+        });
+        console.log('Response Success:', response.data);
+        if (response.data.statusCode !== 200) {
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: response.data.message,
+            position: 'top',
+            visibilityTime: 3000,
+          });
+          return;
+        }
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: response.data.message,
+          position: 'top',
+          visibilityTime: 3000,
+        });
+        // Navigate to event screen here
+        navigation.navigate('PhotoGallery', {
+          eventId: response.data.data.eventId,
+          eventCode: response.data.data.eventCode,
+          eventName: response.data.data.eventName,
+        });
+      } catch (error) {
+        console.error('Error to join event ', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to join event. Please try again.',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [eventCode, navigation],
+  );
 
   // QR Scanner View
   if (isScanning) {
@@ -237,7 +248,7 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
           <ThemedText style={styles.title}>Join Event</ThemedText>
@@ -310,15 +321,16 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
 
         {/* Join Button */}
         <CustomButton
-          onPress={() => handleJoinEvent()}
+          onPress={() => handleJoinEvent(eventCode)}
           title={isLoading ? 'Joining...' : 'Join Event'}
           rightIcon="arrow-right-alt"
+          iconColor={colors.white}
           loading={isLoading}
           type="primary"
           style={styles.joinButton}
           disabled={eventCode.trim().length < 3}
         />
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -328,7 +340,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    flex: 1,
     paddingHorizontal: 24,
     paddingTop: 40,
   },

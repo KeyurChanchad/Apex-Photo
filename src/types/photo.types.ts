@@ -20,12 +20,9 @@ export interface GetFacesResponse {
 }
 
 export interface Photo {
-  id: string;
-  url: string;
-  thumbnailUrl: string;
-  createdAt: string;
-  eventId: string;
-  faceId?: string;
+  eventPhotoId: string;
+  fileUrl: string;
+  thumbnailUrl: string | null;
 }
 
 export interface GetMyPhotosParams {

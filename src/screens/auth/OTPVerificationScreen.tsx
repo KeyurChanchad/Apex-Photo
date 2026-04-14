@@ -13,6 +13,7 @@ import { ThemedText } from '../../components/common/ThemedText';
 import CustomButton from '../../components/common/CustomButton';
 import { useTheme } from '../../theme/ThemeContext';
 import Toast from 'react-native-toast-message';
+import { StackActions } from '@react-navigation/native';
 
 interface OTPVerificationScreenProps {
   route: {
@@ -92,7 +93,9 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
         position: 'top',
         visibilityTime: 3000,
       });
-      navigation.replace('Main', { name: 'EventList' });
+      navigation.dispatch(
+        StackActions.replace('Main', { screen: 'EventList' }),
+      );
     } catch (error: any) {
       Alert.alert('Verification Failed', error.message);
     }
@@ -179,7 +182,7 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
           </Pressable>
           <View style={styles.resendContainer}>
             {!canResend ? (
-              <ThemedText variant="body1" weight="bold">
+              <ThemedText variant="body1" style={{ fontWeight: '400' }}>
                 Resend code in {timer} seconds
               </ThemedText>
             ) : (

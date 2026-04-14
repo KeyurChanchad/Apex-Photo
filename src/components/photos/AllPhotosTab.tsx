@@ -1,10 +1,9 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { getAllPhotos } from '../../services/photoService';
 import Toast from 'react-native-toast-message';
 import { Photo } from '../../types/photo.types';
 import PhotosGrid from './PhotoGrid';
-import { generateMockPhotos } from '../../utils/helper';
 
 const AllPhotosTab: React.FC<{
   navigation: any;
@@ -19,19 +18,26 @@ const AllPhotosTab: React.FC<{
   selectedPhotos,
   onPhotoSelect,
 }) => {
+  console.log('eventId ', eventId);
+
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   //   const navigation = useNavigation();
 
-  const fetchPhotos = async () => {
+  const fetchPhotos = useCallback(async () => {
     try {
       setLoading(true);
-      // const response = await getAllPhotos(eventId);
-      // setPhotos(response.data);
-      const data = generateMockPhotos(150, 'ENY43423');
-      setPhotos(data);
+      if (!eventId) return;
+      const response = await getAllPhotos(eventId);
+      console.log('Response of getall photos ', response);
+      if (response.statusCode === 200) {
+        setPhotos(response.data.photos);
+      }
+      // const data = generateMockPhotos(150, 'ENY43423');
+      // setPhotos(data);
     } catch (error) {
+      console.error('Error to fetch photos ', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -41,12 +47,12 @@ const AllPhotosTab: React.FC<{
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [eventId]);
 
   useFocusEffect(
     useCallback(() => {
       fetchPhotos();
-    }, [eventId]),
+    }, [fetchPhotos]),
   );
 
   const onRefresh = () => {
@@ -58,7 +64,7 @@ const AllPhotosTab: React.FC<{
     if (!selectionMode) {
       navigation.navigate('PhotoDetail', { photo });
     } else {
-      onPhotoSelect(photo.id);
+      onPhotoSelect(photo.eventPhotoId);
     }
   };
 

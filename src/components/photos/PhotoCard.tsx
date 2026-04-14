@@ -45,7 +45,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
           </View>
         )}
         <Image
-          source={{ uri: photo.thumbnailUrl || photo.url }}
+          source={{ uri: photo.thumbnailUrl || photo.fileUrl }}
           style={styles.image}
           onLoadStart={() => setImageLoading(true)}
           onLoadEnd={() => setImageLoading(false)}
@@ -61,7 +61,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
           </View>
         )}
       </View>
-      
+
       {selectionMode && (
         <TouchableOpacity style={styles.checkbox} onPress={onSelect}>
           <MaterialIcon
@@ -71,17 +71,6 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
           />
         </TouchableOpacity>
       )}
-      
-      <View style={styles.overlay}>
-        {photo.eventName && (
-          <Text style={styles.eventName} numberOfLines={1}>
-            {photo.eventName}
-          </Text>
-        )}
-        <Text style={styles.date}>
-          {new Date(photo.uploadedAt).toLocaleDateString()}
-        </Text>
-      </View>
     </TouchableOpacity>
   );
 };
@@ -147,24 +136,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 2,
     zIndex: 2,
-  },
-  overlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 8,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-  },
-  eventName: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  date: {
-    color: '#ccc',
-    fontSize: 10,
-    marginTop: 2,
   },
 });
 

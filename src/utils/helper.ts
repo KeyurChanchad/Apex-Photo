@@ -1,4 +1,5 @@
 import api from '../services/api';
+import { EventStatusType } from '../types/common.types';
 import { Photo } from '../types/photo.types';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -44,4 +45,22 @@ const copyToClipboard = (text: string) => {
   Clipboard.setString(text);
 };
 
-export { decodeQRCodeFromImage, generateMockPhotos, copyToClipboard };
+const getStatusName = (code: EventStatusType) => {
+  switch (code) {
+    case 1:
+      return 'ACTIVE';
+    case 2:
+      return 'CLOSED';
+    case 3:
+      return 'UPCOMING';
+    default:
+      break;
+  }
+};
+
+export {
+  decodeQRCodeFromImage,
+  generateMockPhotos,
+  copyToClipboard,
+  getStatusName,
+};

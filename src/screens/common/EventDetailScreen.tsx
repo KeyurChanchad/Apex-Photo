@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -16,13 +16,17 @@ import { useTheme } from '../../theme/ThemeContext';
 import { ThemedText } from '../../components/common/ThemedText';
 import { EventStatusType } from '../../types/common.types';
 import Toast from 'react-native-toast-message';
-import { copyToClipboard } from '../../utils/helper';
+import { copyToClipboard, getStatusName } from '../../utils/helper';
+import { EventDetailResponse, EventDetailType } from '../../types/event.types';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import api from '../../services/api';
+import { useRoute } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 const qrSize = width * 0.5;
 
 // Mock QR component - replace with actual QR code library
-const MockQRCode = ({ size }: { size: number }) => {
+const QrCode = ({ size }: { size: number }) => {
   const { colors } = useTheme();
   return (
     <View
@@ -48,6 +52,39 @@ const MockQRCode = ({ size }: { size: number }) => {
 
 const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
+  const { params } = useRoute();
+  const [isLoading, setIsLoading] = useState(false);
+  const [eventData, setEventData] = useState<EventDetailType | null>(null);
+  const eventId = (params as { eventId: string }).eventId;
+
+  const getEventDetail = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      console.log('Getting detail....');
+
+      const response: EventDetailResponse = await api.get(
+        `/PortfolioEventApi/EventDetail?eventId=${eventId}`,
+      );
+      console.log('response of detail ', response);
+
+      if (response.data.data) {
+        setEventData(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error to get event details ', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error to get event detail',
+        text2: 'Please try again later.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    getEventDetail();
+  }, [getEventDetail]);
 
   const handleSaveQR = () => {
     Alert.alert('Save QR', 'QR code saved to gallery');
@@ -60,11 +97,11 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const handleShareLink = async () => {
     try {
       await Share.share({
-        message: 'Join my event: https://yourapp.com/event/123456',
         title: 'Share Event',
+        message: 'https://localhost:7286/Portfolio/EventCode?code=HK20260703',
       });
     } catch (error) {
-      Alert.alert('Error', 'Could not share link');
+      console.error('Error to share link ', error);
     }
   };
 
@@ -80,31 +117,27 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const getStatusColor = (status: EventStatusType) => {
     switch (status) {
-      case 'ACTIVE':
+      case 1:
         return colors.success;
-      case 'UPCOMING':
-        return colors.secondary;
-      case 'CLOSED':
+      case 2:
         return colors.primary;
+      case 3:
+        return colors.secondary;
       default:
         return colors.textSecondary;
     }
   };
 
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        title: 'Event link',
-        message: 'https://localhost:7286/Portfolio/EventCode?code=HK20260703',
-      });
-    } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Share Failed',
-        text2: 'Please try again',
-      });
-    }
-  };
+  if (isLoading) return <LoadingSpinner visible={true} />;
+
+  if (!eventData) {
+    return (
+      <View style={styles.emptyContainer}>
+        <MaterialIcons name="event" size={80} color="#ccc" />
+        <ThemedText style={styles.emptyText}>Event detail not found</ThemedText>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -119,7 +152,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             color={colors.text}
             onPress={handleGoBack}
           />
-          <ThemedText variant="h2" style={styles.title}>
+          <ThemedText variant="h3" style={styles.title}>
             Event Details
           </ThemedText>
         </View>
@@ -135,8 +168,8 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           ]}
         >
           {/* Event Name */}
-          <ThemedText variant="h3" style={styles.eventName}>
-            EventName
+          <ThemedText variant="h4" style={styles.eventName}>
+            {eventData.name}
           </ThemedText>
 
           <View style={styles.eventDesc}>
@@ -150,7 +183,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               <ThemedText
                 style={[styles.dateText, { color: colors.textSecondary }]}
               >
-                Wed, Apr 1, 2026
+                {new Date(eventData.eventDate).toDateString()}
               </ThemedText>
             </View>
 
@@ -158,13 +191,18 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <View
               style={[
                 styles.statusBadge,
-                { backgroundColor: getStatusColor('CLOSED') + '20' },
+                {
+                  backgroundColor: getStatusColor(eventData.eventStatus) + '20',
+                },
               ]}
             >
               <ThemedText
-                style={[styles.statusText, { color: getStatusColor('CLOSED') }]}
+                style={[
+                  styles.statusText,
+                  { color: getStatusColor(eventData.eventStatus) },
+                ]}
               >
-                CLOSED
+                {getStatusName(eventData.eventStatus)}
               </ThemedText>
             </View>
           </View>
@@ -193,12 +231,12 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               variant="h3"
               style={[styles.codeValue, { color: colors.primaryDark }]}
             >
-              123456
+              {eventData.eventCode}
             </ThemedText>
             <Pressable
               style={[styles.shareButton]}
               onPress={() => {
-                copyToClipboard('123456');
+                copyToClipboard(eventData.eventCode);
               }}
             >
               <MaterialIcons
@@ -227,7 +265,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </ThemedText>
 
           <View style={styles.qrWrapper}>
-            <MockQRCode size={qrSize} />
+            <QrCode size={qrSize} />
             {/* <ThemedText
                 style={[styles.qrNotAvailable, { color: colors.error }]}
               >
@@ -291,7 +329,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 styles.shareButton,
                 { backgroundColor: colors.background },
               ]}
-              onPress={handleShare}
+              onPress={handleShareLink}
             >
               <MaterialIcons
                 name="share"
@@ -330,7 +368,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             activeOpacity={0.7}
           >
             <MaterialIcons name="photo-library" size={24} color={colors.text} />
-            <ThemedText style={[styles.navButtonText, { color: colors.text }]}>
+            <ThemedText style={[styles.navButtonText, { color: colors.white }]}>
               Gallery
             </ThemedText>
           </TouchableOpacity>
@@ -386,6 +424,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   codeValue: {
     // fontSize: 48,
@@ -473,6 +512,18 @@ const styles = StyleSheet.create({
   shareButton: {
     padding: 14,
     borderRadius: '50%',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    marginTop: 16,
+    marginBottom: 24,
+    color: '#666',
   },
 });
 

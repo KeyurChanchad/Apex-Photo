@@ -19,8 +19,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
   route,
   navigation,
 }) => {
-  const { eventId = 'EVT93839', eventName = 'Event #EVT93839' } =
-    route.params || {};
+  const { eventId, eventName } = route.params || {};
   const { colors } = useTheme();
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
@@ -30,7 +29,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
     if (route.params?.screen) {
       navigation.navigate(route.params.screen);
     }
-  }, [route.params]);
+  }, [navigation, route.params]);
 
   const handlePhotoSelect = (photoId: string) => {
     if (selectedPhotos.includes(photoId)) {
@@ -69,6 +68,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
       setSelectionMode(false);
       setSelectedPhotos([]);
     } catch (error) {
+      console.error('Error to download multiple ', error);
       Toast.show({
         type: 'error',
         text1: 'Download Failed',
@@ -94,6 +94,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
                 text2: 'All event photos are being downloaded',
               });
             } catch (error) {
+              console.error('Error to download all ', error);
               Toast.show({
                 type: 'error',
                 text1: 'Download Failed',

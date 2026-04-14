@@ -205,10 +205,17 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
                   <MaterialIcons
                     name="send"
                     size={20}
-                    color={colors.textInverse || '#FFFFFF'}
+                    color={disabledBtn ? colors.textSecondary : colors.white}
                   />
                 )}
-                <ThemedText style={styles.buttonText}>
+                <ThemedText
+                  style={[
+                    styles.buttonText,
+                    {
+                      color: disabledBtn ? colors.textSecondary : colors.white,
+                    },
+                  ]}
+                >
                   {loginLoading ? 'Sending...' : 'Send OTP'}
                 </ThemedText>
               </View>

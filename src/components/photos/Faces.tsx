@@ -23,27 +23,28 @@ const FacesTab: React.FC<{
   const [refreshing, setRefreshing] = useState(false);
   // const navigation = useNavigation();
 
-  const fetchPhotos = async () => {
+  const fetchPhotos = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getFaces(eventId);
       setPhotos(response.data);
     } catch (error) {
+      console.error('Error to get faces in event ', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: 'Failed to load favorites',
+        text2: 'Failed to load faces',
       });
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [eventId]);
 
   useFocusEffect(
     useCallback(() => {
       fetchPhotos();
-    }, []),
+    }, [fetchPhotos]),
   );
 
   const onRefresh = () => {
@@ -55,7 +56,7 @@ const FacesTab: React.FC<{
     if (!selectionMode) {
       navigation.navigate('PhotoDetail', { photo });
     } else {
-      onPhotoSelect(photo.id);
+      onPhotoSelect(photo.eventPhotoId);
     }
   };
 

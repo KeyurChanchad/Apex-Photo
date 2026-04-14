@@ -304,6 +304,7 @@ export const FaceTabScreen: React.FC<{
         type="primary"
         style={styles.findButton}
         disabled={!selfie || isLoading}
+        iconColor={colors.white}
       />
 
       {/* Info Section */}

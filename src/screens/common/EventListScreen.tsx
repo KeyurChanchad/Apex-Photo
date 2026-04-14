@@ -10,10 +10,15 @@ import {
   Pressable,
 } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
-import { EventItemType, EventStatusType } from '../../types/common.types';
+import {
+  EventItemType,
+  EventStatusType,
+  UserEventsResponse,
+} from '../../types/common.types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import { useNavigation } from '@react-navigation/native';
+import api from '../../services/api';
+import { getStatusName } from '../../utils/helper';
 
 const EventListScreen = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
@@ -24,45 +29,10 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
   // API call to fetch joined events
   const fetchJoinedEvents = async () => {
     try {
-      // Replace with your actual API endpoint
-      // const response = await fetch(
-      //   'https://your-api.com/api/user/joined-events',
-      //   {
-      //     method: 'GET',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       // Add authorization token if needed
-      //       // 'Authorization': 'Bearer YOUR_TOKEN',
-      //     },
-      //   },
-      // );
-
-      // const data = await response.json();
-      // setEvents(data);
-      // Sample data for testing
-      setEvents([
-        {
-          id: '1',
-          name: 'Tech Conference 2026',
-          eventNumber: '123456',
-          date: 'Apr 1, 2026',
-          status: 'ACTIVE',
-        },
-        {
-          id: '2',
-          name: 'Design Workshop',
-          eventNumber: '789012',
-          date: 'Apr 15, 2026',
-          status: 'UPCOMING',
-        },
-        {
-          id: '3',
-          name: 'Hackathon',
-          eventNumber: '345678',
-          date: 'Mar 25, 2026',
-          status: 'CLOSED',
-        },
-      ]);
+      const response: UserEventsResponse = await api.get(
+        'PortfolioEventApi/UserEvents',
+      );
+      if (response.data.statusCode === 200) setEvents(response.data.data);
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
@@ -87,12 +57,12 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
 
   const getStatusColor = (status: EventStatusType) => {
     switch (status) {
-      case 'ACTIVE':
+      case 1:
         return colors.success;
-      case 'UPCOMING':
-        return colors.secondary;
-      case 'CLOSED':
+      case 2:
         return colors.primary;
+      case 3:
+        return colors.secondary;
       default:
         return colors.textSecondary;
     }
@@ -102,34 +72,42 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
     <Pressable
       style={[
         styles.eventCard,
-        { backgroundColor: colors.background, shadowColor: colors.shadow },
+        {
+          backgroundColor: colors.backgroundSecondary,
+          shadowColor: colors.shadow,
+        },
       ]}
-      onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
+      onPress={() =>
+        navigation.navigate('EventDetail', { eventId: item.eventId })
+      }
     >
       <View style={styles.eventHeader}>
         <Text style={[styles.eventName, { color: colors.text }]}>
-          {item.name}
+          {item.eventName}
         </Text>
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: getStatusColor(item.status) + '20' },
+            { backgroundColor: getStatusColor(item.eventStatus) + '20' },
           ]}
         >
           <Text
-            style={[styles.statusText, { color: getStatusColor(item.status) }]}
+            style={[
+              styles.statusText,
+              { color: getStatusColor(item.eventStatus) },
+            ]}
           >
-            {item.status}
+            {getStatusName(item.eventStatus)}
           </Text>
         </View>
       </View>
 
       <View style={styles.eventDetails}>
         <Text style={[styles.eventNumber, { color: colors.primary }]}>
-          # {item.eventNumber}
+          # {item.eventCode}
         </Text>
         <Text style={[styles.eventDate, { color: colors.textSecondary }]}>
-          {item.date}
+          {new Date(item.eventDate).toDateString()}
         </Text>
       </View>
     </Pressable>
@@ -188,7 +166,7 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
 
       <FlatList
         data={events}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.eventId}
         renderItem={renderEventCard}
         contentContainerStyle={styles.listContainer}
         refreshControl={
