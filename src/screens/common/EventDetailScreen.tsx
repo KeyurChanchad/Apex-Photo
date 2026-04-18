@@ -26,20 +26,28 @@ const { width } = Dimensions.get('window');
 const qrSize = width * 0.5;
 
 // Mock QR component - replace with actual QR code library
-const QrCode = ({ base64, size }: { base64: string; size: number }) => {
+const QrCode = ({ base64, size }: { base64: string | null; size: number }) => {
   const { colors } = useTheme();
   return (
     <View
       style={[
         styles.qrImg,
-        { width: size, height: size, backgroundColor: colors.info },
+        {
+          width: size,
+          height: size,
+          backgroundColor: colors.backgroundSecondary,
+        },
       ]}
     >
-      <Image
-        resizeMode="cover"
-        source={require('../../assets/images/qrcode.png')}
-        style={{ width: size, height: size, borderRadius: 12 }}
-      />
+      {base64 ? (
+        <Image
+          resizeMode="cover"
+          source={{ uri: `data:image/png;base64,${base64}` }}
+          style={{ width: size, height: size, borderRadius: 12 }}
+        />
+      ) : (
+        <ThemedText> No QR Available</ThemedText>
+      )}
     </View>
   );
 };
@@ -269,28 +277,33 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 QR not available
               </ThemedText> */}
               </View>
-              <View style={{ alignSelf: 'center' }}>
-                <TouchableOpacity
-                  style={[
-                    styles.saveQrButton,
-                    styles.row,
-                    {
-                      borderWidth: 1,
-                      borderColor: colors.primary,
-                    },
-                  ]}
-                  onPress={handleSaveQR}
-                >
-                  <MaterialIcons
-                    name="download"
-                    size={26}
-                    color={colors.primary}
-                  />
-                  <ThemedText variant="body1" style={{ color: colors.primary }}>
-                    Save QR
-                  </ThemedText>
-                </TouchableOpacity>
-              </View>
+              {eventData.qrCodeBase64 && (
+                <View style={{ alignSelf: 'center' }}>
+                  <TouchableOpacity
+                    style={[
+                      styles.saveQrButton,
+                      styles.row,
+                      {
+                        borderWidth: 1,
+                        borderColor: colors.primary,
+                      },
+                    ]}
+                    onPress={handleSaveQR}
+                  >
+                    <MaterialIcons
+                      name="download"
+                      size={26}
+                      color={colors.primary}
+                    />
+                    <ThemedText
+                      variant="body1"
+                      style={{ color: colors.primary }}
+                    >
+                      Save QR
+                    </ThemedText>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
 
             {/* Share Link Section */}

@@ -99,7 +99,7 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
           {/* Header Section */}
           <View style={styles.header}>
             <ThemedText variant="h1" weight="bold" style={styles.title}>
-              EventFaceFinder
+              ApexPhoto
             </ThemedText>
             <ThemedText variant="body2" style={styles.subtitle}>
               Your memories, beautifully organized
@@ -205,6 +205,13 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
                   <MaterialIcons
                     name="send"
                     size={20}
+                    style={{
+                      transform: [
+                        {
+                          rotate: '-45deg',
+                        },
+                      ],
+                    }}
                     color={disabledBtn ? colors.textSecondary : colors.white}
                   />
                 )}
@@ -303,7 +310,7 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     marginBottom: 8,
-    fontSize: 28,
+    fontSize: 36,
   },
   subtitle: {
     textAlign: 'center',

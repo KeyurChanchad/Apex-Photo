@@ -11,9 +11,9 @@ export interface EventDetailType {
   eventStatus: EventStatusType;
   isDownloadPhoto: boolean;
   isSharePhoto: boolean;
-  shareLink: string;
-  shareToken: string;
-  qrCodeBase64: string;
+  shareLink: string | null;
+  shareToken: string | null;
+  qrCodeBase64: string | null;
 }
 
 export type EventDetailResponse = ApiResponse<EventDetailType>;

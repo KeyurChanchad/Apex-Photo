@@ -78,14 +78,14 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.eventfacefinder"
+    namespace "com.apexinfocom.apexphoto"
     defaultConfig {
-        applicationId "com.eventfacefinder"
+        applicationId "com.apexinfocom.apexphoto"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        resValue "string", "build_config_package", "com.eventfacefinder"
+        resValue "string", "build_config_package", "com.apexinfocom.apexphoto"
     }
     signingConfigs {
         debug {
