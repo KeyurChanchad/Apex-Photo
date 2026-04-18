@@ -200,7 +200,7 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
                 }}
               >
                 {loginLoading ? (
-                  <ActivityIndicator color={colors.text} />
+                  <ActivityIndicator color={colors.white} />
                 ) : (
                   <MaterialIcons
                     name="send"

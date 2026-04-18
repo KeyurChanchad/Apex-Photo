@@ -26,19 +26,13 @@ const { width } = Dimensions.get('window');
 const qrSize = width * 0.5;
 
 // Mock QR component - replace with actual QR code library
-const QrCode = ({ size }: { size: number }) => {
+const QrCode = ({ base64, size }: { base64: string; size: number }) => {
   const { colors } = useTheme();
   return (
     <View
       style={[
-        {
-          width: size,
-          height: size,
-          backgroundColor: colors.black,
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderRadius: 12,
-        },
+        styles.qrImg,
+        { width: size, height: size, backgroundColor: colors.info },
       ]}
     >
       <Image
@@ -106,12 +100,21 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   };
 
   const handleGalleryPress = () => {
-    navigation.navigate('PhotoGallery');
+    navigation.navigate('PhotoGallery', {
+      eventId: eventData?.eventId,
+      eventCode: eventData?.eventCode,
+      eventName: eventData?.name,
+    });
   };
 
   const handleMyFacePress = () => {
     navigation.navigate('PhotoGallery', {
       screen: 'MyPhotos',
+      params: {
+        eventId: eventData?.eventId,
+        eventCode: eventData?.eventCode,
+        eventName: eventData?.name,
+      },
     });
   };
 
@@ -130,15 +133,6 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   if (isLoading) return <LoadingSpinner visible={true} />;
 
-  if (!eventData) {
-    return (
-      <View style={styles.emptyContainer}>
-        <MaterialIcons name="event" size={80} color="#ccc" />
-        <ThemedText style={styles.emptyText}>Event detail not found</ThemedText>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -149,7 +143,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <MaterialIcons
             name="arrow-back"
             size={26}
-            color={colors.text}
+            color={colors.primary}
             onPress={handleGoBack}
           />
           <ThemedText variant="h3" style={styles.title}>
@@ -157,242 +151,262 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </ThemedText>
         </View>
 
-        {/** Event Basic Detail Section */}
-        <View
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.backgroundSecondary,
-              shadowColor: colors.shadow,
-            },
-          ]}
-        >
-          {/* Event Name */}
-          <ThemedText variant="h4" style={styles.eventName}>
-            {eventData.name}
-          </ThemedText>
-
-          <View style={styles.eventDesc}>
-            {/* Date */}
-            <View style={styles.row}>
-              <MaterialIcons
-                name="date-range"
-                size={20}
-                color={colors.primaryDark}
-              />
-              <ThemedText
-                style={[styles.dateText, { color: colors.textSecondary }]}
-              >
-                {new Date(eventData.eventDate).toDateString()}
-              </ThemedText>
-            </View>
-
-            {/* Event Status Badge */}
+        {eventData ? (
+          <>
+            {/** Event Basic Detail Section */}
             <View
               style={[
-                styles.statusBadge,
+                styles.card,
                 {
-                  backgroundColor: getStatusColor(eventData.eventStatus) + '20',
+                  backgroundColor: colors.backgroundSecondary,
+                  shadowColor: colors.shadow,
+                },
+              ]}
+            >
+              {/* Event Name */}
+              <ThemedText variant="h4" style={styles.eventName}>
+                {eventData.name}
+              </ThemedText>
+
+              <View style={styles.eventDesc}>
+                {/* Date */}
+                <View style={styles.row}>
+                  <MaterialIcons
+                    name="date-range"
+                    size={20}
+                    color={colors.primaryDark}
+                  />
+                  <ThemedText
+                    style={[styles.dateText, { color: colors.textSecondary }]}
+                  >
+                    {new Date(eventData.eventDate).toDateString()}
+                  </ThemedText>
+                </View>
+
+                {/* Event Status Badge */}
+                <View
+                  style={[
+                    styles.statusBadge,
+                    {
+                      backgroundColor:
+                        getStatusColor(eventData.eventStatus) + '20',
+                    },
+                  ]}
+                >
+                  <ThemedText
+                    style={[
+                      styles.statusText,
+                      { color: getStatusColor(eventData.eventStatus) },
+                    ]}
+                  >
+                    {getStatusName(eventData.eventStatus)}
+                  </ThemedText>
+                </View>
+              </View>
+            </View>
+
+            {/** Event Code Section */}
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.backgroundSecondary,
+                  shadowColor: colors.shadow,
+                },
+              ]}
+            >
+              {/* EVENT CODE Label */}
+              <ThemedText
+                style={[styles.cardTitle, { color: colors.textSecondary }]}
+              >
+                EVENT CODE
+              </ThemedText>
+
+              {/* Event Code Value */}
+              <View style={[styles.row, { justifyContent: 'space-between' }]}>
+                <ThemedText
+                  variant="h3"
+                  style={[styles.codeValue, { color: colors.primaryDark }]}
+                >
+                  {eventData.eventCode}
+                </ThemedText>
+                <Pressable
+                  style={[styles.shareButton]}
+                  onPress={() => {
+                    copyToClipboard(eventData.eventCode);
+                  }}
+                >
+                  <MaterialIcons
+                    name="content-copy"
+                    size={26}
+                    color={colors.primaryDark}
+                  />
+                </Pressable>
+              </View>
+            </View>
+
+            {/* QR Section */}
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.backgroundSecondary,
+                  shadowColor: colors.shadow,
                 },
               ]}
             >
               <ThemedText
-                style={[
-                  styles.statusText,
-                  { color: getStatusColor(eventData.eventStatus) },
-                ]}
+                style={[styles.cardTitle, { color: colors.textSecondary }]}
               >
-                {getStatusName(eventData.eventStatus)}
+                SCAN TO JOIN EVENT
               </ThemedText>
-            </View>
-          </View>
-        </View>
 
-        {/** Event Code Section */}
-        <View
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.backgroundSecondary,
-              shadowColor: colors.shadow,
-            },
-          ]}
-        >
-          {/* EVENT CODE Label */}
-          <ThemedText
-            style={[styles.cardTitle, { color: colors.textSecondary }]}
-          >
-            EVENT CODE
-          </ThemedText>
-
-          {/* Event Code Value */}
-          <View style={[styles.row, { justifyContent: 'space-between' }]}>
-            <ThemedText
-              variant="h3"
-              style={[styles.codeValue, { color: colors.primaryDark }]}
-            >
-              {eventData.eventCode}
-            </ThemedText>
-            <Pressable
-              style={[styles.shareButton]}
-              onPress={() => {
-                copyToClipboard(eventData.eventCode);
-              }}
-            >
-              <MaterialIcons
-                name="content-copy"
-                size={26}
-                color={colors.primaryDark}
-              />
-            </Pressable>
-          </View>
-        </View>
-
-        {/* QR Section */}
-        <View
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.backgroundSecondary,
-              shadowColor: colors.shadow,
-            },
-          ]}
-        >
-          <ThemedText
-            style={[styles.cardTitle, { color: colors.textSecondary }]}
-          >
-            SCAN TO JOIN EVENT
-          </ThemedText>
-
-          <View style={styles.qrWrapper}>
-            <QrCode size={qrSize} />
-            {/* <ThemedText
+              <View style={styles.qrWrapper}>
+                <QrCode base64={eventData.qrCodeBase64} size={qrSize} />
+                {/* <ThemedText
                 style={[styles.qrNotAvailable, { color: colors.error }]}
               >
                 QR not available
               </ThemedText> */}
-          </View>
-          <View style={{ alignSelf: 'center' }}>
-            <TouchableOpacity
+              </View>
+              <View style={{ alignSelf: 'center' }}>
+                <TouchableOpacity
+                  style={[
+                    styles.saveQrButton,
+                    styles.row,
+                    {
+                      borderWidth: 1,
+                      borderColor: colors.primary,
+                    },
+                  ]}
+                  onPress={handleSaveQR}
+                >
+                  <MaterialIcons
+                    name="download"
+                    size={26}
+                    color={colors.primary}
+                  />
+                  <ThemedText variant="body1" style={{ color: colors.primary }}>
+                    Save QR
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Share Link Section */}
+            <View
               style={[
-                styles.saveQrButton,
-                styles.row,
+                styles.card,
                 {
-                  borderWidth: 1,
-                  borderColor: colors.primary,
+                  backgroundColor: colors.backgroundSecondary,
+                  shadowColor: colors.shadow,
                 },
               ]}
-              onPress={handleSaveQR}
             >
-              <MaterialIcons name="download" size={26} color={colors.primary} />
-              <ThemedText variant="body1" style={{ color: colors.primary }}>
-                Save QR
+              <ThemedText
+                style={[styles.cardTitle, { color: colors.textSecondary }]}
+              >
+                {' '}
+                SHARE LINK{' '}
               </ThemedText>
-            </TouchableOpacity>
-          </View>
-        </View>
 
-        {/* Share Link Section */}
-        <View
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.backgroundSecondary,
-              shadowColor: colors.shadow,
-            },
-          ]}
-        >
-          <ThemedText
-            style={[styles.cardTitle, { color: colors.textSecondary }]}
-          >
-            {' '}
-            SHARE LINK{' '}
-          </ThemedText>
+              {/** Link */}
+              <View
+                style={{
+                  backgroundColor: colors.background,
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                }}
+              >
+                <ThemedText style={{ opacity: 0.7 }}>
+                  https://localhost:7286/Portfolio/EventCode?code=HK20260703
+                </ThemedText>
+              </View>
 
-          {/** Link */}
-          <View
-            style={{
-              backgroundColor: colors.background,
-              paddingHorizontal: 10,
-              paddingVertical: 6,
-            }}
-          >
-            <ThemedText style={{ opacity: 0.7 }}>
-              https://localhost:7286/Portfolio/EventCode?code=HK20260703
-            </ThemedText>
-          </View>
-
-          {/** Share action buttons */}
-          <View style={styles.shareButtons}>
-            <Pressable
-              style={[
-                styles.shareButton,
-                { backgroundColor: colors.background },
-              ]}
-              onPress={handleShareLink}
-            >
-              <MaterialIcons
-                name="share"
-                size={26}
-                color={colors.primaryDark}
-              />
-            </Pressable>
-            <Pressable
-              style={[
-                styles.shareButton,
-                { backgroundColor: colors.background },
-              ]}
-              onPress={() => {
-                copyToClipboard('https://localhost:5327/event?code=Hk349384');
-              }}
-            >
-              <MaterialIcons
-                name="content-copy"
-                size={26}
-                color={colors.primaryDark}
-              />
-            </Pressable>
-          </View>
-          {/* <ThemedText
+              {/** Share action buttons */}
+              <View style={styles.shareButtons}>
+                <Pressable
+                  style={[
+                    styles.shareButton,
+                    { backgroundColor: colors.background },
+                  ]}
+                  onPress={handleShareLink}
+                >
+                  <MaterialIcons
+                    name="share"
+                    size={26}
+                    color={colors.primaryDark}
+                  />
+                </Pressable>
+                <Pressable
+                  style={[
+                    styles.shareButton,
+                    { backgroundColor: colors.background },
+                  ]}
+                  onPress={() => {
+                    copyToClipboard(
+                      'https://localhost:5327/event?code=Hk349384',
+                    );
+                  }}
+                >
+                  <MaterialIcons
+                    name="content-copy"
+                    size={26}
+                    color={colors.primaryDark}
+                  />
+                </Pressable>
+              </View>
+              {/* <ThemedText
             style={[styles.shareNotAvailable, { color: colors.error }]}
           >
             Share link not available
           </ThemedText> */}
-        </View>
+            </View>
 
-        {/* Bottom Navigation Buttons */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity
-            style={[styles.navButton, { backgroundColor: colors.primary }]}
-            onPress={handleGalleryPress}
-            activeOpacity={0.7}
-          >
-            <MaterialIcons
-              name="photo-library"
-              size={24}
-              color={colors.white}
-            />
-            <ThemedText style={[styles.navButtonText, { color: colors.white }]}>
-              Gallery
-            </ThemedText>
-          </TouchableOpacity>
+            {/* Bottom Navigation Buttons */}
+            <View style={styles.bottomNav}>
+              <TouchableOpacity
+                style={[styles.navButton, { backgroundColor: colors.primary }]}
+                onPress={handleGalleryPress}
+                activeOpacity={0.7}
+              >
+                <MaterialIcons
+                  name="photo-library"
+                  size={24}
+                  color={colors.white}
+                />
+                <ThemedText
+                  style={[styles.navButtonText, { color: colors.white }]}
+                >
+                  Gallery
+                </ThemedText>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.navButton,
-              { borderWidth: 1, borderColor: colors.primary },
-            ]}
-            onPress={handleMyFacePress}
-            activeOpacity={0.7}
-          >
-            <MaterialIcons name="face" size={24} color={colors.primary} />
-            <ThemedText
-              style={[styles.navButtonText, { color: colors.primary }]}
-            >
-              My Face
+              <TouchableOpacity
+                style={[
+                  styles.navButton,
+                  { borderWidth: 1, borderColor: colors.primary },
+                ]}
+                onPress={handleMyFacePress}
+                activeOpacity={0.7}
+              >
+                <MaterialIcons name="face" size={24} color={colors.primary} />
+                <ThemedText
+                  style={[styles.navButtonText, { color: colors.primary }]}
+                >
+                  My Face
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <View style={styles.emptyContainer}>
+            <MaterialIcons name="event" size={80} color="#ccc" />
+            <ThemedText style={styles.emptyText}>
+              Event detail not found
             </ThemedText>
-          </TouchableOpacity>
-        </View>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -528,6 +542,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 24,
     color: '#666',
+  },
+  qrImg: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
   },
 });
 

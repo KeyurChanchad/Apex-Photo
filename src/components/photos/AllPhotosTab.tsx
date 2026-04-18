@@ -18,10 +18,9 @@ const AllPhotosTab: React.FC<{
   selectedPhotos,
   onPhotoSelect,
 }) => {
-  console.log('eventId ', eventId);
-
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [pageNo, setPageNo] = useState(1);
   const [hasNext, setHasNext] = useState(false);
@@ -36,7 +35,6 @@ const AllPhotosTab: React.FC<{
         }
 
         if (!eventId) return;
-
         const response = await getAllPhotos(eventId, page);
         console.log('Response of getall photos ', response);
 
@@ -58,6 +56,7 @@ const AllPhotosTab: React.FC<{
       } finally {
         setLoading(false);
         setRefreshing(false);
+        setInitialLoading(false);
       }
     },
     [eventId],
@@ -82,6 +81,7 @@ const AllPhotosTab: React.FC<{
   useFocusEffect(
     useCallback(() => {
       // Reset everything when tab comes into focus
+      setInitialLoading(true);
       setPhotos([]);
       setPageNo(1);
       setHasNext(false);
@@ -104,6 +104,7 @@ const AllPhotosTab: React.FC<{
   return (
     <PhotosGrid
       photos={photos}
+      initialLoading={initialLoading}
       loading={loading}
       refreshing={refreshing}
       onRefresh={onRefresh}

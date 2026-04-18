@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Config from 'react-native-config';
-import { navigate, navigationRef } from '../../App';
+import { navigate } from './navigationService';
 
 // Types
 export interface ApiConfig extends RequestInit {
@@ -32,8 +32,8 @@ const BASE_URL =
 // Helper function for creating headers
 const getHeaders = async (
   includeAuth: boolean = true,
-): Promise<HeadersInit> => {
-  const headers: HeadersInit = {
+): Promise<HeadersInit_> => {
+  const headers: HeadersInit_ = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   };
@@ -181,9 +181,15 @@ const request = async <T = any>(
     console.log('Response data ', responseData);
 
     // IMPLEMENT IF RESPONSE RETURN 401
-    if (response && (response.status === 401 || response.statusCode === 401)) {
+    if (
+      response &&
+      (response.status === 401 ||
+        (response as { statusCode?: number }).statusCode === 401)
+    ) {
+      console.log('Unauthorized access ', responseData);
+
       await AsyncStorage.clear();
-      navigate('Login');
+      navigate('Auth', { name: 'Login' });
       throw new Error('Session expired');
     }
 

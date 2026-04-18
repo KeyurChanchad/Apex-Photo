@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 24,
-    paddingTop: 40,
+    paddingTop: 20,
   },
   header: {
     marginBottom: 32,
@@ -429,6 +429,7 @@ const styles = StyleSheet.create({
   },
   joinButton: {
     marginTop: 8,
+    marginBottom: 20,
   },
   // Scanner styles
   scannerContainer: {

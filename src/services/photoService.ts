@@ -46,15 +46,20 @@ export const getFaces = async (eventId: string, page = 1, pageSize = 20) => {
   const response = await api.get(
     `/PortfolioEventApi/EventFaces?eventId=${eventId}&page=${page}&pageSize=${pageSize}`,
   );
-  return response.data;
+  return response;
 };
 
 // Function to get my photos by event ID
-export const getMyPhotos = async (eventId: string, faceId: string) => {
+export const getMyPhotos = async (
+  eventId: string,
+  faceId: string,
+  page = 1,
+  pageSize = 20,
+) => {
   const response = await api.get(
-    `/PortfolioEventApi/FacePhotos?eventId=${eventId}&faceId=${faceId}`,
+    `/PortfolioEventApi/FacePhotos?eventId=${eventId}&faceId=${faceId}&page=${page}&pageSize=${pageSize}`,
   );
-  return response.data;
+  return response;
 };
 
 // Function to upload photo

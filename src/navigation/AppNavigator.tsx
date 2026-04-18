@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  createNavigationContainerRef,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '../theme/ThemeContext';
 import { useAuth } from '../hooks/useAuth';
@@ -15,6 +18,7 @@ import UploadPhotoScreen from '../screens/photos/UploadPhotoScreen';
 import EventListScreen from '../screens/common/EventListScreen';
 import NoMatchFoundScreen from '../components/common/NoMatchFound';
 import EventDetailScreen from '../screens/common/EventDetailScreen';
+import { navigationRef } from '../services/navigationService';
 
 const Stack = createNativeStackNavigator();
 
@@ -218,7 +222,7 @@ export const AppNavigator = () => {
   }
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer theme={navigationTheme} ref={navigationRef}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!isAuthenticated ? (
           <Stack.Screen name="Auth" component={AuthStackNavigator} />

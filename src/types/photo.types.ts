@@ -10,9 +10,10 @@ export interface UploadPhotoData {
 }
 
 export interface Face {
-  faceId: string;
-  photos: Photo[];
-  count: number;
+  eventUniqueFaceId: string;
+  faceImagePath: string;
+  personUniqueId: string;
+  photoCount: number;
 }
 
 export interface GetFacesResponse {

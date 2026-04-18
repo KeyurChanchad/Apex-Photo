@@ -6,34 +6,28 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { Photo } from '../../types/photo.types';
+import { Face } from '../../types/photo.types';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ThemedText } from '../common/ThemedText';
-import PhotoCard from './PhotoCard';
 import { useTheme } from '../../theme/ThemeContext';
+import FacePhotoCard from './FacePhotoCard';
 
-const PhotosGrid: React.FC<{
-  photos: Photo[];
+const FacePhotosGrid: React.FC<{
+  faces: Face[];
   initialLoading: boolean;
   loading: boolean;
   refreshing: boolean;
   onRefresh: () => void;
-  selectionMode: boolean;
-  selectedPhotos: string[];
-  onPhotoSelect: (photoId: string) => void;
-  onPhotoPress: (photo: Photo) => void;
+  handleFacePress: (photo: Face) => void;
   fetchNextPage: () => void;
   hasNext: boolean;
 }> = ({
-  photos,
+  faces,
   initialLoading,
   loading,
   refreshing,
   onRefresh,
-  selectionMode,
-  selectedPhotos,
-  onPhotoSelect,
-  onPhotoPress,
+  handleFacePress,
   hasNext,
   fetchNextPage,
 }) => {
@@ -53,7 +47,7 @@ const PhotosGrid: React.FC<{
     );
   }
 
-  if (photos.length === 0) {
+  if (faces.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <MaterialIcons name="photo-library" size={80} color="#ccc" />
@@ -64,18 +58,15 @@ const PhotosGrid: React.FC<{
 
   return (
     <FlatList
-      data={photos}
+      data={faces}
       renderItem={({ item }) => (
-        <PhotoCard
-          key={item.eventPhotoId}
+        <FacePhotoCard
+          key={item.personUniqueId}
           photo={item}
-          selected={selectedPhotos.includes(item.eventPhotoId)}
-          onSelect={() => onPhotoSelect(item.eventPhotoId)}
-          selectionMode={selectionMode}
-          onPress={() => onPhotoPress(item)}
+          onPress={() => handleFacePress(item)}
         />
       )}
-      keyExtractor={item => item.eventPhotoId}
+      keyExtractor={item => item.personUniqueId}
       numColumns={2}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -96,7 +87,7 @@ const PhotosGrid: React.FC<{
   );
 };
 
-export default PhotosGrid;
+export default FacePhotosGrid;
 
 const styles = StyleSheet.create({
   centerContainer: {
