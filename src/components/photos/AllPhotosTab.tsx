@@ -23,42 +23,75 @@ const AllPhotosTab: React.FC<{
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  //   const navigation = useNavigation();
+  const [pageNo, setPageNo] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
 
-  const fetchPhotos = useCallback(async () => {
-    try {
-      setLoading(true);
-      if (!eventId) return;
-      const response = await getAllPhotos(eventId);
-      console.log('Response of getall photos ', response);
-      if (response.statusCode === 200) {
-        setPhotos(response.data.photos);
+  const fetchPhotos = useCallback(
+    async (page: number, isRefresh = false) => {
+      try {
+        if (isRefresh) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
+
+        if (!eventId) return;
+
+        const response = await getAllPhotos(eventId, page);
+        console.log('Response of getall photos ', response);
+
+        if (response.statusCode === 200) {
+          if (isRefresh) {
+            setPhotos(response.data.photos);
+          } else {
+            setPhotos(prev => [...prev, ...response.data.photos]);
+          }
+          setHasNext(response.data.hasMore);
+        }
+      } catch (error) {
+        console.error('Error to fetch photos ', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to load photos',
+        });
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-      // const data = generateMockPhotos(150, 'ENY43423');
-      // setPhotos(data);
-    } catch (error) {
-      console.error('Error to fetch photos ', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to load photos',
-      });
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [eventId]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchPhotos();
-    }, [fetchPhotos]),
+    },
+    [eventId],
   );
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchPhotos();
-  };
+  // Load more function
+  const fetchNextPage = useCallback(() => {
+    if (!loading && !refreshing && hasNext) {
+      const nextPage = pageNo + 1;
+      setPageNo(nextPage);
+      fetchPhotos(nextPage, false);
+    }
+  }, [loading, refreshing, hasNext, pageNo, fetchPhotos]);
+
+  // Refresh function
+  const onRefresh = useCallback(() => {
+    setPageNo(1);
+    fetchPhotos(1, true);
+  }, [fetchPhotos]);
+
+  // Initial load and page change
+  useFocusEffect(
+    useCallback(() => {
+      // Reset everything when tab comes into focus
+      setPhotos([]);
+      setPageNo(1);
+      setHasNext(false);
+      fetchPhotos(1, true);
+
+      return () => {
+        // Optional: cleanup if needed
+      };
+    }, [fetchPhotos]), // Re-run when eventId changes
+  );
 
   const handlePhotoPress = (photo: Photo) => {
     if (!selectionMode) {
@@ -78,6 +111,8 @@ const AllPhotosTab: React.FC<{
       selectedPhotos={selectedPhotos}
       onPhotoSelect={onPhotoSelect}
       onPhotoPress={handlePhotoPress}
+      fetchNextPage={fetchNextPage}
+      hasNext={hasNext}
     />
   );
 };

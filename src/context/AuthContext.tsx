@@ -2,11 +2,6 @@ import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import { DeviceRegisterRequest } from '../types/user.types';
-import {
-  ApiResponse,
-  VerifyMobileResponse,
-  VerifyOTPResponse,
-} from '../types/common.types';
 
 interface AuthContextType {
   loading: boolean;
@@ -70,7 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('Device register successfully ', response.data);
 
       // Store device ID for later use
-      await AsyncStorage.setItem('deviceId', response.data.data);
+      await AsyncStorage.setItem('deviceId', response.data);
     } catch (error: unknown) {
       console.log('Error to register device  ', error);
       const errorMessage =
@@ -93,19 +88,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null;
       }
       console.log('verify mobile data ', { countryCode, mobileNo, deviceId });
-      const response: VerifyMobileResponse = await api.post(
-        '/AccountApi/MobileNoVerify',
-        {
-          countryCode,
-          mobileNo,
-          deviceId,
-        },
-      );
+      const response = await api.post('/AccountApi/MobileNoVerify', {
+        countryCode,
+        mobileNo,
+        deviceId,
+      });
       if (response.data.statusCode !== 200) {
         setError(response.data.message);
       }
       console.log('response verify mobile ', response.data);
-      return response.data.data.refId as string;
+      return response.data.refId as string;
     } catch (error: unknown) {
       console.log('Error to verify mobile ', error);
       const errorMessage =
@@ -119,7 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await api.post('/auth/logout').catch(() => {});
+      // await api.post('/auth/logout').catch(() => {});
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -139,26 +131,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }> => {
     try {
       setError(null);
-      const response: VerifyOTPResponse = await api.post(
-        '/AccountApi/OTPVerify',
-        {
-          refId,
-          otp,
-        },
-      );
-      if (response.data.statusCode !== 200) {
-        return { success: false, message: response.data.message };
-      }
+      const response = await api.post('/AccountApi/OTPVerify', {
+        refId,
+        otp,
+      });
       console.log('response of verify otp ', response.data);
-      await AsyncStorage.setItem('token', response.data.data.jwtToken);
-      await AsyncStorage.setItem(
-        'refreshToken',
-        response.data.data.refreshToken,
-      );
-      await AsyncStorage.setItem('userId', response.data.data.userId);
-      await AsyncStorage.setItem('mobileNo', response.data.data.userName);
+      if (response.statusCode !== 200) {
+        return { success: false, message: response.message };
+      }
+      await AsyncStorage.setItem('token', response.data.jwtToken);
+      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+      await AsyncStorage.setItem('userId', response.data.userId);
+      await AsyncStorage.setItem('mobileNo', response.data.userName);
       setIsAuthenticated(true);
-      return { success: true, message: response.data.message };
+      return { success: true, message: response.message };
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || 'OTP verification failed';

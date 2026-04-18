@@ -1,17 +1,13 @@
-import { AxiosResponse } from 'axios';
-
 export interface ApiError {
   message: string;
   statusCode: number;
   error?: string;
 }
 
-export interface ApiResponse<T = unknown> extends AxiosResponse {
-  data: {
-    statusCode: number;
-    message: string;
-    data: T;
-  };
+export interface ApiResponse<T> {
+  statusCode: number;
+  message: string;
+  data: T;
 }
 
 export interface VerifyMobileData {
@@ -19,7 +15,7 @@ export interface VerifyMobileData {
   refId: string;
 }
 
-export type VerifyMobileResponse = ApiResponse<VerifyMobileData>;
+export type VerifyMobileResponse = VerifyMobileData;
 
 export interface VerifyOTPData {
   designationId: string | null;

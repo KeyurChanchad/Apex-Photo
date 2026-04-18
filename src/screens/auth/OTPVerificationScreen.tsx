@@ -75,7 +75,9 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
     }
 
     try {
+      console.log('response of verify otp ', refId, otpString);
       const response = await verifyOTP(refId, otpString);
+
       if (!response.success) {
         Toast.show({
           type: 'error',

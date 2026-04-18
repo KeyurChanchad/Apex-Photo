@@ -34,10 +34,11 @@ export const getAllPhotos = async (
   page = 1,
   pageSize = 20,
 ) => {
+  console.log('Get all photos ', eventId, page, pageSize);
   const response = await api.get(
     `/PortfolioEventApi/EventGallery?eventId=${eventId}&page=${page}&pageSize=${pageSize}`,
   );
-  return response.data;
+  return response;
 };
 
 // Function to get faces by event ID - returns face-wise photos and count

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,6 +10,7 @@ import { Photo } from '../../types/photo.types';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ThemedText } from '../common/ThemedText';
 import PhotoCard from './PhotoCard';
+import { useTheme } from '../../theme/ThemeContext';
 
 const PhotosGrid: React.FC<{
   photos: Photo[];
@@ -19,6 +21,8 @@ const PhotosGrid: React.FC<{
   selectedPhotos: string[];
   onPhotoSelect: (photoId: string) => void;
   onPhotoPress: (photo: Photo) => void;
+  fetchNextPage: () => void;
+  hasNext: boolean;
 }> = ({
   photos,
   loading,
@@ -28,14 +32,24 @@ const PhotosGrid: React.FC<{
   selectedPhotos,
   onPhotoSelect,
   onPhotoPress,
+  hasNext,
+  fetchNextPage,
 }) => {
-  if (loading && !refreshing) {
-    return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
-      </View>
-    );
-  }
+  const { colors } = useTheme();
+
+  const handleEndReached = useCallback(async () => {
+    if (hasNext && !loading) {
+      fetchNextPage();
+    }
+  }, [hasNext, loading, fetchNextPage]);
+
+  // if (loading && !refreshing) {
+  //   return (
+  //     <View style={styles.centerContainer}>
+  //       <ActivityIndicator size="large" color="#1976d2" />
+  //     </View>
+  //   );
+  // }
 
   if (photos.length === 0) {
     return (
@@ -51,6 +65,7 @@ const PhotosGrid: React.FC<{
       data={photos}
       renderItem={({ item }) => (
         <PhotoCard
+          key={item.eventPhotoId}
           photo={item}
           selected={selectedPhotos.includes(item.eventPhotoId)}
           onSelect={() => onPhotoSelect(item.eventPhotoId)}
@@ -64,6 +79,17 @@ const PhotosGrid: React.FC<{
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
       contentContainerStyle={styles.gridContainer}
+      onEndReachedThreshold={0.2}
+      onEndReached={handleEndReached}
+      ListFooterComponent={
+        true ? (
+          <ActivityIndicator
+            color={colors.primary}
+            size="large"
+            style={{ marginBottom: 20 }}
+          />
+        ) : null
+      }
     />
   );
 };

@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import MaterialIcon from '@react-native-vector-icons/material-icons';
 import { Photo } from '../../types/photo.types';
+import Config from 'react-native-config';
+import { useTheme } from '../../theme/ThemeContext';
 
 interface PhotoCardProps {
   photo: Photo;
@@ -31,6 +33,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 }) => {
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const { colors } = useTheme();
+  const photoUri = `${Config.PHOTO_URL}${photo.fileUrl}`;
 
   return (
     <TouchableOpacity
@@ -41,11 +45,11 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
       <View style={styles.imageContainer}>
         {imageLoading && (
           <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color="#1976d2" />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         )}
         <Image
-          source={{ uri: photo.thumbnailUrl || photo.fileUrl }}
+          source={{ uri: photoUri }}
           style={styles.image}
           onLoadStart={() => setImageLoading(true)}
           onLoadEnd={() => setImageLoading(false)}

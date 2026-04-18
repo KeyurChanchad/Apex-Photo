@@ -20,8 +20,6 @@ import { useTheme } from '../../theme/ThemeContext';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { launchImageLibrary, PhotoQuality } from 'react-native-image-picker';
 import api from '../../services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 
 export const JoinEventScreen: React.FC<{ navigation: any }> = ({
   navigation,
@@ -165,11 +163,11 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
           accessCode: joinCode,
         });
         console.log('Response Success:', response.data);
-        if (response.data.statusCode !== 200) {
+        if (response.statusCode !== 200) {
           Toast.show({
             type: 'error',
             text1: 'Error',
-            text2: response.data.message,
+            text2: response.message,
             position: 'top',
             visibilityTime: 3000,
           });
@@ -178,15 +176,15 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
         Toast.show({
           type: 'success',
           text1: 'Success',
-          text2: response.data.message,
+          text2: response.message,
           position: 'top',
           visibilityTime: 3000,
         });
         // Navigate to event screen here
         navigation.navigate('PhotoGallery', {
-          eventId: response.data.data.eventId,
-          eventCode: response.data.data.eventCode,
-          eventName: response.data.data.eventName,
+          eventId: response.data.eventId,
+          eventCode: response.data.eventCode,
+          eventName: response.data.eventName,
         });
       } catch (error) {
         console.error('Error to join event ', error);

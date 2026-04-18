@@ -27,7 +27,9 @@ const FacesTab: React.FC<{
     try {
       setLoading(true);
       const response = await getFaces(eventId);
-      setPhotos(response.data);
+      console.log('response of get faces ', response);
+
+      setPhotos(response);
     } catch (error) {
       console.error('Error to get faces in event ', error);
       Toast.show({
@@ -43,7 +45,7 @@ const FacesTab: React.FC<{
 
   useFocusEffect(
     useCallback(() => {
-      fetchPhotos();
+      // fetchPhotos();
     }, [fetchPhotos]),
   );
 

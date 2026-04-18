@@ -67,8 +67,8 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       );
       console.log('response of detail ', response);
 
-      if (response.data.data) {
-        setEventData(response.data.data);
+      if (response.data) {
+        setEventData(response.data);
       }
     } catch (error) {
       console.error('Error to get event details ', error);
@@ -367,7 +367,11 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             onPress={handleGalleryPress}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="photo-library" size={24} color={colors.text} />
+            <MaterialIcons
+              name="photo-library"
+              size={24}
+              color={colors.white}
+            />
             <ThemedText style={[styles.navButtonText, { color: colors.white }]}>
               Gallery
             </ThemedText>

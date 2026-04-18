@@ -32,7 +32,9 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
       const response: UserEventsResponse = await api.get(
         'PortfolioEventApi/UserEvents',
       );
-      if (response.data.statusCode === 200) setEvents(response.data.data);
+      console.log('res of user events ', response);
+
+      if (response.statusCode === 200) setEvents(response.data);
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
