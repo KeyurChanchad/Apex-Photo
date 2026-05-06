@@ -18,6 +18,8 @@ import Toast from 'react-native-toast-message';
 import CameraCapture from './CameraCapture';
 import PhotosGrid from './PhotoGrid';
 import { generateMockPhotos } from '../../utils/helper';
+import { scanPhoto, uploadPhoto } from '../../services/photoService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Photo {
   id: string;
@@ -59,11 +61,13 @@ export const FaceTabScreen: React.FC<{
     const options = {
       selectionLimit: 1,
       mediaType: 'photo' as const,
-      includeBase64: false,
+      includeBase64: true,
       quality: 1 as PhotoQuality,
     };
 
     launchImageLibrary(options, async response => {
+      console.log('response of upload imge ', response);
+
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorCode) {
@@ -117,30 +121,37 @@ export const FaceTabScreen: React.FC<{
     setIsLoading(true);
 
     try {
-      // Simulate API call to find faces
-      // Replace with actual API call
-      // const response = await api.post('/EventShareApi/FindFaces', {
-      //   eventId: eventId,
-      //   selfie: selfie, // Base64 or form data
-      // });
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        Toast.show({
+          type: 'error',
+          text1: 'User Id not found',
+          text2: 'Please login again',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+        return;
+      }
+      const formData = new FormData();
+      formData.append('eventId', eventId);
+      formData.append('applicationUserId', userId);
+      formData.append('selfiFile', {
+        uri: selfie,
+        name: 'photo.jpg',
+        type: 'image/jpeg',
+      } as any);
+      formData.append('loginId', userId);
 
-      // Simulate API delay
-      await new Promise(resolve =>
-        setTimeout(() => {
-          resolve(null);
-        }, 2000),
-      );
+      const response = await uploadPhoto(formData);
+      console.log('Response of find face api ', response);
 
-      // Mock response - replace with actual API response
-      const mockPhotos: Photo[] = generateMockPhotos(100, eventId);
-
-      setDetectedFaces(mockPhotos);
-      setShowResults(true);
+      // setDetectedFaces(mockPhotos);
+      // setShowResults(true);
 
       Toast.show({
         type: 'success',
         text1: 'Success',
-        text2: `Found ${mockPhotos.length} photos with your face`,
+        text2: `Found 100 photos with your face`,
         position: 'top',
         visibilityTime: 3000,
       });
@@ -152,7 +163,7 @@ export const FaceTabScreen: React.FC<{
           navigation.goBack();
         },
         onBackGallery: () => {
-          navigation.replace('PhotoGallery  ');
+          navigation.replace('PhotoGallery');
         },
       });
     } finally {
@@ -272,7 +283,9 @@ export const FaceTabScreen: React.FC<{
       ) : (
         <View style={styles.previewCard}>
           <Image
-            source={{ uri: `file://${selfie}` }}
+            source={{
+              uri: selfie.startsWith('file://') ? selfie : `file://${selfie}`,
+            }}
             style={styles.selfiePreview}
           />
 

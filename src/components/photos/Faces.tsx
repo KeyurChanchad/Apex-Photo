@@ -5,6 +5,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Face, Photo } from '../../types/photo.types';
 import FacePhotosGrid from './FacePhotosGrid';
 import PhotosGrid from './PhotoGrid';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { useTheme } from '../../theme/ThemeContext';
+import { ThemedText } from '../common/ThemedText';
+import { PhotoViewer } from './PhotoPreview';
 
 const FacesTab: React.FC<{
   navigation: any;
@@ -19,6 +24,7 @@ const FacesTab: React.FC<{
   selectedPhotos,
   onPhotoSelect,
 }) => {
+  const { colors } = useTheme();
   const [selectedFaceId, setSelectedFaceId] = useState<string | null>(null);
   const [faces, setFaces] = useState<Face[]>([]);
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -27,6 +33,12 @@ const FacesTab: React.FC<{
   const [refreshing, setRefreshing] = useState(false);
   const [pageNo, setPageNo] = useState(1);
   const [hasNext, setHasNext] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<{
+    photoId: string | null;
+    photoUrl: string | null;
+  } | null>(null);
+  const [totalPhotos, setTotalPhotos] = useState(0);
 
   const fetchFaces = useCallback(
     async (page: number, isRefresh = false) => {
@@ -43,9 +55,9 @@ const FacesTab: React.FC<{
 
         if (response.statusCode === 200) {
           if (isRefresh) {
-            setFaces(response.data);
+            setFaces(response.data.faces);
           } else {
-            setFaces(prev => [...prev, ...response.data]);
+            setFaces(prev => [...prev, ...response.data.faces]);
           }
           setHasNext(response.data.hasMore);
         }
@@ -76,15 +88,16 @@ const FacesTab: React.FC<{
 
         if (!eventId || !selectedFaceId) return;
         const response = await getMyPhotos(eventId, selectedFaceId, page);
-        console.log('response of get faces ', response);
+        console.log('response of get photos by face ', response);
 
         if (response.statusCode === 200) {
           if (isRefresh) {
-            setPhotos(response.data);
+            setPhotos(response.data.photos);
           } else {
-            setPhotos(prev => [...prev, ...response.data]);
+            setPhotos(prev => [...prev, ...response.data.photos]);
           }
           setHasNext(response.data.hasMore);
+          setTotalPhotos(response.data.totalRecords);
         }
       } catch (error) {
         console.error('Error to get faces in event ', error);
@@ -159,9 +172,19 @@ const FacesTab: React.FC<{
     setSelectedFaceId(photo.eventUniqueFaceId);
   }, []);
 
+  const openPhotoPreview = (photo: { photoId: string; photoUrl: string }) => {
+    console.log('Opening photo viewer with:', photo);
+    setSelectedPhoto(photo);
+    setShowPreview(true);
+  };
+
   const handlePhotoPress = (photo: Photo) => {
     if (!selectionMode) {
-      navigation.navigate('PhotoDetail', { photo });
+      console.log('click on photo ', photo);
+      openPhotoPreview({
+        photoId: photo.eventPhotoId,
+        photoUrl: photo.fileUrl,
+      });
     } else {
       onPhotoSelect(photo.eventPhotoId);
     }
@@ -170,19 +193,69 @@ const FacesTab: React.FC<{
   return (
     <>
       {selectedFaceId ? (
-        <PhotosGrid
-          photos={photos}
-          initialLoading={initialLoading}
-          loading={loading}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          selectionMode={selectionMode}
-          selectedPhotos={selectedPhotos}
-          onPhotoSelect={onPhotoSelect}
-          onPhotoPress={handlePhotoPress}
-          fetchNextPage={fetchNextPage}
-          hasNext={hasNext}
-        />
+        <View style={styles.container}>
+          <View
+            style={[styles.headerContainer, { borderColor: colors.border }]}
+          >
+            <View style={styles.headerContent}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.backButton}
+              >
+                <MaterialIcons
+                  name="arrow-back"
+                  size={24}
+                  color={colors.text}
+                />
+              </TouchableOpacity>
+
+              <View style={styles.titleContainer}>
+                <ThemedText style={styles.title}>Match Found</ThemedText>
+                <View style={styles.statsContainer}>
+                  <ThemedText
+                    style={[
+                      styles.totalPhotos,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    {totalPhotos} Total Photos
+                  </ThemedText>
+                  <View style={styles.successIcon}>
+                    <MaterialIcons
+                      name="check-circle"
+                      size={20}
+                      color={colors.success}
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+          <PhotosGrid
+            photos={photos}
+            initialLoading={initialLoading}
+            loading={loading}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            selectionMode={selectionMode}
+            selectedPhotos={selectedPhotos}
+            onPhotoSelect={onPhotoSelect}
+            onPhotoPress={handlePhotoPress}
+            fetchNextPage={fetchNextPage}
+            hasNext={hasNext}
+          />
+          {/* Photo Viewer Overlay - Make sure it's at the end of your component */}
+          <PhotoViewer
+            visible={showPreview}
+            photoId={selectedPhoto?.photoId}
+            photoUrl={selectedPhoto?.photoUrl}
+            onClose={() => {
+              console.log('Closing photo viewer');
+              setShowPreview(false);
+              setSelectedPhoto(null);
+            }}
+          />
+        </View>
       ) : (
         <FacePhotosGrid
           faces={faces}
@@ -200,3 +273,42 @@ const FacesTab: React.FC<{
 };
 
 export default FacesTab;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  headerContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  backButton: {
+    padding: 4,
+  },
+  titleContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  totalPhotos: {
+    fontSize: 14,
+  },
+  successIcon: {
+    marginLeft: 4,
+  },
+});

@@ -4,6 +4,7 @@ import { getAllPhotos } from '../../services/photoService';
 import Toast from 'react-native-toast-message';
 import { Photo } from '../../types/photo.types';
 import PhotosGrid from './PhotoGrid';
+import { PhotoViewer } from './PhotoPreview';
 
 const AllPhotosTab: React.FC<{
   navigation: any;
@@ -11,19 +12,18 @@ const AllPhotosTab: React.FC<{
   selectionMode: boolean;
   selectedPhotos: string[];
   onPhotoSelect: (photoId: string) => void;
-}> = ({
-  navigation,
-  eventId,
-  selectionMode,
-  selectedPhotos,
-  onPhotoSelect,
-}) => {
+}> = ({ eventId, selectionMode, selectedPhotos, onPhotoSelect }) => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [initialLoading, setInitialLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [pageNo, setPageNo] = useState(1);
   const [hasNext, setHasNext] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<{
+    photoId: string | null;
+    photoUrl: string | null;
+  } | null>(null);
 
   const fetchPhotos = useCallback(
     async (page: number, isRefresh = false) => {
@@ -93,28 +93,51 @@ const AllPhotosTab: React.FC<{
     }, [fetchPhotos]), // Re-run when eventId changes
   );
 
+  const openPhotoPreview = (photo: { photoId: string; photoUrl: string }) => {
+    console.log('Opening photo viewer with:', photo);
+    setSelectedPhoto(photo);
+    setShowPreview(true);
+  };
+
   const handlePhotoPress = (photo: Photo) => {
     if (!selectionMode) {
-      navigation.navigate('PhotoDetail', { photo });
+      console.log('click on photo ', photo);
+      openPhotoPreview({
+        photoId: photo.eventPhotoId,
+        photoUrl: photo.fileUrl,
+      });
     } else {
       onPhotoSelect(photo.eventPhotoId);
     }
   };
 
   return (
-    <PhotosGrid
-      photos={photos}
-      initialLoading={initialLoading}
-      loading={loading}
-      refreshing={refreshing}
-      onRefresh={onRefresh}
-      selectionMode={selectionMode}
-      selectedPhotos={selectedPhotos}
-      onPhotoSelect={onPhotoSelect}
-      onPhotoPress={handlePhotoPress}
-      fetchNextPage={fetchNextPage}
-      hasNext={hasNext}
-    />
+    <>
+      <PhotosGrid
+        photos={photos}
+        initialLoading={initialLoading}
+        loading={loading}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        selectionMode={selectionMode}
+        selectedPhotos={selectedPhotos}
+        onPhotoSelect={onPhotoSelect}
+        onPhotoPress={handlePhotoPress}
+        fetchNextPage={fetchNextPage}
+        hasNext={hasNext}
+      />
+      {/* Photo Viewer Overlay - Make sure it's at the end of your component */}
+      <PhotoViewer
+        visible={showPreview}
+        photoId={selectedPhoto?.photoId}
+        photoUrl={selectedPhoto?.photoUrl}
+        onClose={() => {
+          console.log('Closing photo viewer');
+          setShowPreview(false);
+          setSelectedPhoto(null);
+        }}
+      />
+    </>
   );
 };
 

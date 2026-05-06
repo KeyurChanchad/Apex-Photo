@@ -65,9 +65,9 @@ export const lightColors = {
 
 export const darkColors = {
   // Primary colors
-  primary: '#ED1A3C',
-  primaryLight: '#F24E68',
-  primaryDark: '#B8142F',
+  primary: '#E22446',
+  primaryLight: '#41191C',
+  primaryDark: '#41191C',
 
   // Secondary colors
   secondary: '#9C8F8A',
@@ -75,9 +75,9 @@ export const darkColors = {
   secondaryDark: '#7D726E',
 
   // Background colors
-  background: '#000000',
-  backgroundSecondary: '#1C1C1E',
-  surface: '#1C1C1E',
+  background: '#211014',
+  backgroundSecondary: '#20181B',
+  surface: '#20181B',
   surfaceSecondary: '#2C2C2E',
 
   // Text colors

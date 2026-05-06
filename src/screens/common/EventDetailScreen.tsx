@@ -42,7 +42,7 @@ const QrCode = ({ base64, size }: { base64: string | null; size: number }) => {
       {base64 ? (
         <Image
           resizeMode="cover"
-          source={{ uri: `data:image/png;base64,${base64}` }}
+          source={{ uri: base64 }}
           style={{ width: size, height: size, borderRadius: 12 }}
         />
       ) : (

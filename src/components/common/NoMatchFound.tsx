@@ -55,15 +55,14 @@ const NoMatchFoundScreen: FC<{
             onPress={handleTryAgain}
             title="Try Again"
             type="primary"
-            style={styles.tryAgainButton}
             leftIcon="refresh"
+            iconColor={colors.white}
           />
 
           <CustomButton
             onPress={handleBackToGallery}
             title="← Back to Gallery"
             type="primary"
-            style={styles.backButton}
           />
         </View>
       </View>
@@ -119,12 +118,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     gap: 12,
-  },
-  tryAgainButton: {
-    marginBottom: 4,
-  },
-  backButton: {
-    borderWidth: 1.5,
   },
 });
 

@@ -84,7 +84,7 @@ const PhotosGrid: React.FC<{
       onEndReachedThreshold={0.2}
       onEndReached={handleEndReached}
       ListFooterComponent={
-        true ? (
+        loading ? (
           <ActivityIndicator
             color={colors.primary}
             size="large"

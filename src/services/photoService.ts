@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import api from './api';
 import Toast from 'react-native-toast-message';
+import { arrayBufferToBase64 } from '../utils/helper';
 
 // Function to request storage permission
 export const requestStoragePermission = async (): Promise<boolean> => {
@@ -64,15 +65,28 @@ export const getMyPhotos = async (
 
 // Function to upload photo
 export const uploadPhoto = async (formData: FormData) => {
-  return api.post('/photos/upload', formData, {
+  return api.post('/PortfolioEventApi/UploadSelfie', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
 };
 
+// Function to scan photo from base64
+export const scanPhoto = async (
+  userId: string,
+  eventId: string,
+  imageBase64: string,
+) => {
+  return api.post('/PortfolioEventApi/UploadSelfie', {
+    userId,
+    eventId,
+    imageBase64,
+  });
+};
+
 // Function to download a single photo
-export const downloadPhoto = async (photoId: string) => {
+export const downloadPhoto = async (photoId: string, isHD: boolean) => {
   const hasPermission = await requestStoragePermission();
   if (!hasPermission) {
     Toast.show({
@@ -82,23 +96,45 @@ export const downloadPhoto = async (photoId: string) => {
     });
     return;
   }
+  console.log('download photo param ', { photoId, isHD });
 
   try {
-    const response = await api.get(`/photos/download/${photoId}`, {
-      responseType: 'blob',
-    });
+    console.log('Downloading photo:', photoId);
 
-    // Save to Pictures directory for images
+    // Use the raw method to get the full Response object
+    const arrayBuffer = await api.download(
+      `/PortfolioEventApi/DownloadPhoto?eventPhotoId=${photoId}&isHD=${isHD}`,
+    );
+
+    // Get the image data as arrayBuffer
+    console.log('ArrayBuffer size:', arrayBuffer.byteLength, 'bytes');
+
+    // Verify it's a JPEG (check for FF D8 magic number)
+    const bytes = new Uint8Array(arrayBuffer);
+    if (bytes[0] !== 0xff || bytes[1] !== 0xd8) {
+      console.warn(
+        'First bytes:',
+        bytes[0].toString(16),
+        bytes[1].toString(16),
+      );
+      throw new Error('Received data is not a valid JPEG image');
+    }
+
+    // Convert to base64
+    const base64String = arrayBufferToBase64(arrayBuffer);
+    console.log('Base64 length:', base64String.length);
+
+    // Save to Pictures directory
     const downloadDest = `${
       RNFS.PicturesDirectoryPath
     }/event_photo_${photoId}_${Date.now()}.jpg`;
+    console.log('Save path:', downloadDest);
 
-    const options = {
-      fromUrl: response.config.url!,
-      toFile: downloadDest,
-    };
+    await RNFS.writeFile(downloadDest, base64String, 'base64');
 
-    await RNFS.downloadFile(options).promise;
+    // Verify file was saved
+    const fileInfo = await RNFS.stat(downloadDest);
+    console.log('File saved successfully, size:', fileInfo.size, 'bytes');
 
     Toast.show({
       type: 'success',
@@ -107,6 +143,11 @@ export const downloadPhoto = async (photoId: string) => {
     });
   } catch (error) {
     console.error('Download error:', error);
+    Toast.show({
+      type: 'error',
+      text1: 'Download Failed',
+      text2: (error as { message?: string }).message || 'An error occurred',
+    });
     throw error;
   }
 };
@@ -139,7 +180,7 @@ export const downloadMultiplePhotos = async (photoIds: string[]) => {
 };
 
 // Function to download all photos
-export const downloadAllPhotos = async () => {
+export const downloadAllPhotos = async (eventId: string) => {
   const hasPermission = await requestStoragePermission();
   if (!hasPermission) {
     Toast.show({
@@ -151,7 +192,9 @@ export const downloadAllPhotos = async () => {
   }
 
   try {
-    const response = await api.get('/photos/download-all');
+    const response = await api.get(
+      `/PortfolioEventApi/BulkDownload?eventId=${eventId}`,
+    );
     console.log('responseo of downlod all ', response);
 
     Toast.show({

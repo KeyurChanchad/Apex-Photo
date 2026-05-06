@@ -173,7 +173,7 @@ const request = async <T = any>(
     const response = await fetchWithTimeout(
       url,
       config,
-      customConfig.timeout || 10000,
+      customConfig.timeout || 100000,
     );
 
     // Parse JSON response
@@ -205,6 +205,68 @@ const request = async <T = any>(
       return handleTokenRefresh<T>(method, endpoint, data, customConfig);
     }
     throw error;
+  }
+};
+
+const handleTokenRefreshForBinary = async (
+  endpoint: string,
+  originalConfig: ApiConfig,
+): Promise<ArrayBuffer> => {
+  originalConfig._retry = true;
+
+  try {
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    // Refresh the token
+    const refreshResponse = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken: refreshToken.trim() }),
+    });
+
+    if (!refreshResponse.ok) {
+      throw new Error('Refresh failed');
+    }
+
+    const refreshData: RefreshTokenResponse = await refreshResponse.json();
+    const { accessToken } = refreshData;
+
+    if (accessToken) {
+      await AsyncStorage.setItem('token', accessToken);
+
+      // Retry the original request with new token
+      const headers = await getHeaders(true);
+      const url = `${BASE_URL}${
+        endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+      }`;
+
+      const retryResponse = await fetchWithTimeout(
+        url,
+        {
+          method: 'GET',
+          headers,
+        },
+        originalConfig.timeout || 30000,
+      );
+
+      if (!retryResponse.ok) {
+        throw new Error(`HTTP error ${retryResponse.status}`);
+      }
+
+      return await retryResponse.arrayBuffer();
+    }
+
+    throw new Error('No access token in refresh response');
+  } catch (refreshError) {
+    console.log('Refresh failed:', refreshError);
+    await AsyncStorage.clear();
+    navigate('Auth', { name: 'Login' });
+    throw refreshError;
   }
 };
 
@@ -249,6 +311,45 @@ const api = {
       },
       options.timeout || 10000,
     );
+  },
+  download: async (
+    endpoint: string,
+    options: ApiConfig = {},
+  ): Promise<ArrayBuffer> => {
+    const url = `${BASE_URL}${
+      endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+    }`;
+    const headers = await getHeaders(!options.skipAuth);
+
+    const config: RequestInit = {
+      method: 'GET',
+      headers: { ...headers, ...options.headers },
+      ...options,
+    };
+
+    try {
+      const response = await fetchWithTimeout(
+        url,
+        config,
+        options.timeout || 30000,
+      );
+
+      if (!response.ok) {
+        const error = new Error(`HTTP error ${response.status}`) as ApiError;
+        error.status = response.status;
+        throw error;
+      }
+
+      // Return arraybuffer for binary data
+      return await response.arrayBuffer();
+    } catch (error) {
+      const apiError = error as ApiError;
+      if (apiError.status === 401 && !options._retry && !options.skipAuth) {
+        // For token refresh, we need a special handler for binary
+        return handleTokenRefreshForBinary(endpoint, options);
+      }
+      throw error;
+    }
   },
 };
 

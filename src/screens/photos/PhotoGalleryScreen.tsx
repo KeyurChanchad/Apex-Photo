@@ -37,6 +37,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
     } else {
       setSelectedPhotos([...selectedPhotos, photoId]);
     }
+    console.log('selected photo ', selectedPhotos);
   };
 
   const handleDownloadSelected = async () => {
@@ -51,12 +52,13 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
 
     try {
       if (selectedPhotos.length === 1) {
-        await photoService.downloadPhoto(selectedPhotos[0]);
-        Toast.show({
-          type: 'success',
-          text1: 'Download Started',
-          text2: 'Photo is being downloaded',
-        });
+        await photoService.downloadPhoto(selectedPhotos[0], true);
+        // Toast.show({
+        //   type: 'success',
+        //   text1: 'Download Started',
+        //   text2: 'Photo is being downloaded',
+        //   visibilityTime: 1000,
+        // });
       } else {
         await photoService.downloadMultiplePhotos(selectedPhotos);
         Toast.show({
@@ -87,7 +89,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
           text: 'Download',
           onPress: async () => {
             try {
-              await photoService.downloadEventPhotos(eventId);
+              await photoService.downloadAllPhotos(eventId);
               Toast.show({
                 type: 'success',
                 text1: 'Download Started',

@@ -38,7 +38,11 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.card, selected && styles.selectedCard]}
+      style={[
+        styles.card,
+        selected && styles.selectedCard,
+        selected && { borderColor: colors.primary },
+      ]}
       onPress={onPress}
       activeOpacity={0.9}
     >
@@ -71,7 +75,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
           <MaterialIcon
             name={selected ? 'check-box' : 'check-box-outline-blank'}
             size={24}
-            color={selected ? '#1976d2' : '#fff'}
+            color={selected ? colors.primary : '#fff'}
           />
         </TouchableOpacity>
       )}
@@ -82,7 +86,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
-    margin: 8,
+    margin: 6,
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#fff',
@@ -94,7 +98,6 @@ const styles = StyleSheet.create({
   },
   selectedCard: {
     borderWidth: 2,
-    borderColor: '#1976d2',
   },
   imageContainer: {
     position: 'relative',

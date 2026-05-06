@@ -1,12 +1,14 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '../common/ThemedText';
 import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import CustomButton from '../common/CustomButton';
 import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../theme/ThemeContext';
+import RNFS from 'react-native-fs';
+import { convertToBase64 } from '../../utils/helper';
 
 const CameraCapture: React.FC<{
   setSelfie: React.Dispatch<React.SetStateAction<string | null>>;
@@ -22,9 +24,31 @@ const CameraCapture: React.FC<{
       try {
         const photo = await cameraRef.current.takePhoto({
           flash: 'off',
+          enableShutterSound: false, // Optional: disable shutter sound
         });
-        setSelfie(photo.path);
+        console.log('photo captured ', photo);
+
+        // Convert the photo path to base64
+        // const base64Image = await convertToBase64(photo.path);
+        // console.log('photo base ', base64Image);
+
+        // Important: Remove 'file://' prefix for iOS
+        const imageUri =
+          Platform.OS === 'ios'
+            ? photo.path.replace('file://', '')
+            : photo.path;
+
+        // Store base64 instead of path
+        setSelfie(imageUri);
         setShowCamera(false);
+
+        // Optional: Clean up the temporary file to save space
+        try {
+          await RNFS.unlink(photo.path);
+        } catch (cleanupError) {
+          console.warn('Failed to cleanup temp file:', cleanupError);
+        }
+
         Toast.show({
           type: 'success',
           text1: 'Selfie Captured',
@@ -49,7 +73,7 @@ const CameraCapture: React.FC<{
     <View style={styles.cameraContainer}>
       <View style={styles.cameraHeader}>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          onPress={() => setShowCamera(false)}
           style={styles.backButton}
         >
           <MaterialIcons name="arrow-back" size={24} color={colors.white} />

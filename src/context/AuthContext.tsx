@@ -78,6 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyMobileNo = async (
     countryCode: string,
     mobileNo: string,
+    name: string,
   ): Promise<string | null> => {
     try {
       setLoginLoading(true);
@@ -87,11 +88,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setError('Device id not found');
         return null;
       }
-      console.log('verify mobile data ', { countryCode, mobileNo, deviceId });
+      console.log('verify mobile data ', {
+        countryCode,
+        mobileNo,
+        deviceId,
+        name,
+      });
       const response = await api.post('/AccountApi/MobileNoVerify', {
         countryCode,
         mobileNo,
         deviceId,
+        name,
       });
       if (response.data.statusCode !== 200) {
         setError(response.data.message);
