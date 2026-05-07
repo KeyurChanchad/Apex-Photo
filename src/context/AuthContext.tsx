@@ -12,6 +12,7 @@ interface AuthContextType {
   verifyMobileNo: (
     countryCode: string,
     mobileNo: string,
+    name: string,
   ) => Promise<string | null>;
   logout: () => Promise<void>;
   verifyOTP: (

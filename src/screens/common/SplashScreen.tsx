@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Animated,
   ActivityIndicator,
-  Dimensions,
 } from 'react-native';
 import { ThemedText } from '../../components/common/ThemedText';
 import { useTheme } from '../../theme/ThemeContext';
@@ -59,7 +58,7 @@ export const SplashScreen: React.FC<{ onFinish: () => void }> = ({
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.primary }]}>
+    <View style={[styles.container]}>
       <Animated.View
         style={[
           styles.logoContainer,
@@ -71,7 +70,7 @@ export const SplashScreen: React.FC<{ onFinish: () => void }> = ({
       >
         <View style={styles.logoWrapper}>
           <Image
-            source={require('../../assets/images/FaceFinderTransparent.png')}
+            source={require('../../assets/images/apexphoto_transparent.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -131,8 +130,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 180,
+    height: 180,
   },
   appName: {
     fontSize: 28,
