@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
@@ -19,6 +18,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
 import api from '../../services/api';
 import { getStatusName } from '../../utils/helper';
+import { FlashList } from '@shopify/flash-list';
+
+const EmptyListComponent = () => {
+  const { colors } = useTheme();
+  return (
+    <View style={styles.emptyContainer}>
+      <MaterialIcons
+        name="event"
+        size={46}
+        color={colors.error}
+        style={{ paddingBottom: 14 }}
+      />
+      <Text style={[styles.emptyText, { color: colors.text }]}>
+        No events joined yet
+      </Text>
+      <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
+        Join an event using a code or QR scan to get started.
+      </Text>
+    </View>
+  );
+};
 
 const EventListScreen = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
@@ -115,23 +135,6 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
     </Pressable>
   );
 
-  const EmptyListComponent = () => (
-    <View style={styles.emptyContainer}>
-      <MaterialIcons
-        name="event"
-        size={46}
-        color={colors.error}
-        style={{ paddingBottom: 14 }}
-      />
-      <Text style={[styles.emptyText, { color: colors.text }]}>
-        No events joined yet
-      </Text>
-      <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
-        Join an event using a code or QR scan to get started.
-      </Text>
-    </View>
-  );
-
   if (loading && !refreshing) {
     return (
       <View
@@ -166,7 +169,7 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
         </Text>
       </View>
 
-      <FlatList
+      <FlashList
         data={events}
         keyExtractor={item => item.eventId}
         renderItem={renderEventCard}

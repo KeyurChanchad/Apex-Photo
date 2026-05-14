@@ -1,7 +1,12 @@
 // screens/PhotoGalleryScreen.tsx
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+} from 'react-native';
 import MaterialIcon from '@react-native-vector-icons/material-icons';
 import photoService from '../../services/photoService';
 import Toast from 'react-native-toast-message';
@@ -12,9 +17,25 @@ import MyPhotosTab from '../../components/photos/MyPhotoTab';
 import FacesTab from '../../components/photos/Faces';
 import { useTheme } from '../../theme/ThemeContext';
 
-const Tab = createMaterialTopTabNavigator();
+// Tab configuration
+const TABS = [
+  {
+    key: 'AllPhotos',
+    label: 'All Photos',
+    icon: 'photo-library',
+  },
+  {
+    key: 'Faces',
+    label: 'Faces',
+    icon: 'people',
+  },
+  {
+    key: 'MyPhotos',
+    label: 'My Photos',
+    icon: 'person',
+  },
+];
 
-// Main Component with Top Tab Navigator
 const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
   route,
   navigation,
@@ -23,7 +44,9 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
   const { colors } = useTheme();
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
-  // const [currentTab, setCurrentTab] = useState('AllPhotos');
+  const [activeTab, setActiveTab] = useState('AllPhotos');
+  const scrollViewRef = useRef<ScrollView>(null);
+  const tabRefs = useRef<{ [key: string]: View | null }>({});
 
   useEffect(() => {
     if (route.params?.screen) {
@@ -31,16 +54,19 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
     }
   }, [navigation, route.params]);
 
-  const handlePhotoSelect = (photoId: string) => {
-    if (selectedPhotos.includes(photoId)) {
-      setSelectedPhotos(selectedPhotos.filter(id => id !== photoId));
-    } else {
-      setSelectedPhotos([...selectedPhotos, photoId]);
-    }
-    console.log('selected photo ', selectedPhotos);
-  };
+  console.log(selectedPhotos, ' selected ids ');
+  const handlePhotoSelect = useCallback(
+    (photoId: string) => {
+      if (selectedPhotos.includes(photoId)) {
+        setSelectedPhotos(prev => prev.filter(id => id !== photoId));
+      } else {
+        setSelectedPhotos(prev => [...prev, photoId]);
+      }
+    },
+    [selectedPhotos],
+  );
 
-  const handleDownloadSelected = async () => {
+  const handleDownloadSelected = useCallback(async () => {
     if (selectedPhotos.length === 0) {
       Toast.show({
         type: 'info',
@@ -53,12 +79,6 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
     try {
       if (selectedPhotos.length === 1) {
         await photoService.downloadPhoto(selectedPhotos[0], true);
-        // Toast.show({
-        //   type: 'success',
-        //   text1: 'Download Started',
-        //   text2: 'Photo is being downloaded',
-        //   visibilityTime: 1000,
-        // });
       } else {
         await photoService.downloadMultiplePhotos(selectedPhotos);
         Toast.show({
@@ -77,9 +97,9 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
         text2: 'Please try again',
       });
     }
-  };
+  }, [selectedPhotos]);
 
-  const handleDownloadAll = async () => {
+  const handleDownloadAll = useCallback(async () => {
     Alert.alert(
       'Download All Photos',
       'Are you sure you want to download all photos from this event?',
@@ -107,31 +127,59 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
         },
       ],
     );
-  };
+  }, [eventId]);
 
-  const exitSelectionMode = () => {
+  const exitSelectionMode = useCallback(() => {
     setSelectionMode(false);
     setSelectedPhotos([]);
-  };
+  }, []);
+
+  const handleTabPress = useCallback((tabKey: string) => {
+    setActiveTab(tabKey);
+    // Optional: Scroll the selected tab into view
+    if (scrollViewRef.current && tabRefs.current[tabKey]) {
+      tabRefs.current[tabKey]?.measureLayout(
+        scrollViewRef.current as any,
+        x => {
+          scrollViewRef.current?.scrollTo({
+            x: x - 16,
+            animated: true,
+          });
+        },
+        () => {},
+      );
+    }
+  }, []);
 
   const renderSelectionBar = () => (
-    <View style={styles.selectionBar}>
+    <View style={[styles.selectionBar, { borderBottomColor: colors.border }]}>
       <TouchableOpacity
         onPress={exitSelectionMode}
         style={styles.selectionCancelButton}
       >
-        <MaterialIcon name="close" size={24} color="#666" />
-        <ThemedText style={styles.selectionCancelText}>Cancel</ThemedText>
+        <MaterialIcon name="close" size={24} color={colors.textSecondary} />
+        <ThemedText
+          style={[styles.selectionCancelText, { color: colors.textSecondary }]}
+        >
+          Cancel
+        </ThemedText>
       </TouchableOpacity>
-      <ThemedText style={styles.selectionCount}>
-        {selectedPhotos.length} selected
-      </ThemedText>
+      <View style={styles.selectionCountContainer}>
+        <MaterialIcon name="check-circle" size={20} color={colors.primary} />
+        <ThemedText style={[styles.selectionCount, { color: colors.primary }]}>
+          {selectedPhotos.length} selected
+        </ThemedText>
+      </View>
       <TouchableOpacity
         onPress={handleDownloadSelected}
         style={styles.selectionDownloadButton}
       >
-        <MaterialIcon name="download" size={24} color="#1976d2" />
-        <ThemedText style={styles.selectionDownloadText}>Download</ThemedText>
+        <MaterialIcon name="download" size={24} color={colors.primary} />
+        <ThemedText
+          style={[styles.selectionDownloadText, { color: colors.primary }]}
+        >
+          Download
+        </ThemedText>
       </TouchableOpacity>
     </View>
   );
@@ -139,14 +187,16 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.headerTop}>
-        <ThemedText style={styles.title}>{eventName}</ThemedText>
+        <ThemedText style={[styles.title, { color: colors.text }]}>
+          {eventName}
+        </ThemedText>
         {!selectionMode && (
           <View style={styles.headerActions}>
             <TouchableOpacity
               onPress={handleDownloadAll}
               style={styles.headerAction}
             >
-              <MaterialIcon name="download" size={22} color="#1976d2" />
+              <MaterialIcon name="download" size={22} color={colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setSelectionMode(true)}
@@ -155,7 +205,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
               <MaterialIcon
                 name="check-circle-outline"
                 size={22}
-                color="#1976d2"
+                color={colors.primary}
               />
             </TouchableOpacity>
           </View>
@@ -164,96 +214,104 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
     </View>
   );
 
+  const renderCustomTabBar = () => (
+    <View style={styles.tabBarContainer}>
+      <ScrollView
+        ref={scrollViewRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tabScrollContent}
+      >
+        {TABS.map(tab => {
+          const isActive = activeTab === tab.key;
+          return (
+            <TouchableOpacity
+              key={tab.key}
+              ref={ref => {
+                if (ref) tabRefs.current[tab.key] = ref;
+              }}
+              onPress={() => handleTabPress(tab.key)}
+              style={[
+                styles.chipTab,
+                {
+                  backgroundColor: isActive
+                    ? colors.primary
+                    : colors.backgroundSecondary,
+                  borderColor: isActive ? colors.primary : colors.border,
+                },
+              ]}
+              activeOpacity={0.7}
+            >
+              <MaterialIcon
+                name={tab.icon}
+                size={20}
+                color={isActive ? '#FFFFFF' : colors.textSecondary}
+                style={styles.tabIcon}
+              />
+              <ThemedText
+                style={[
+                  styles.chipLabel,
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  {
+                    color: isActive ? '#FFFFFF' : colors.textSecondary,
+                  },
+                ]}
+              >
+                {tab.label}
+              </ThemedText>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'AllPhotos':
+        return (
+          <AllPhotosTab
+            navigation={navigation}
+            eventId={eventId}
+            selectionMode={selectionMode}
+            selectedPhotos={selectedPhotos}
+            onPhotoSelect={handlePhotoSelect}
+          />
+        );
+      case 'Faces':
+        return (
+          <FacesTab
+            navigation={navigation}
+            eventId={eventId}
+            selectionMode={selectionMode}
+            selectedPhotos={selectedPhotos}
+            onPhotoSelect={handlePhotoSelect}
+          />
+        );
+      case 'MyPhotos':
+        return (
+          <MyPhotosTab
+            navigation={navigation}
+            eventId={eventId}
+            selectionMode={selectionMode}
+            selectedPhotos={selectedPhotos}
+            onPhotoSelect={handlePhotoSelect}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      edges={['top']}
+    >
       {renderHeader()}
       {selectionMode && renderSelectionBar()}
-
-      <Tab.Navigator
-        screenOptions={{
-          tabBarActiveTintColor: colors.text,
-          tabBarInactiveTintColor: colors.textSecondary,
-          tabBarIndicatorStyle: { backgroundColor: colors.primary },
-          tabBarStyle: {
-            elevation: 2,
-            shadowOpacity: 0.1,
-            backgroundColor: colors.backgroundSecondary,
-          },
-          tabBarLabelStyle: {
-            fontSize: 14,
-            fontWeight: '600',
-            textTransform: 'capitalize',
-          },
-          // tabBarItemStyle: { backgroundColor: 'red' },
-          animationEnabled: true,
-        }}
-        screenListeners={{
-          state: e => {
-            const tabName =
-              e.data.state?.routes[e.data.state.index]?.name || 'AllPhotos';
-            // setCurrentTab(tabName);
-          },
-        }}
-      >
-        <Tab.Screen
-          name="AllPhotos"
-          options={{
-            tabBarIcon: () => (
-              <MaterialIcon
-                name="photo-library"
-                size={24}
-                color={colors.text}
-              />
-            ),
-          }}
-        >
-          {() => (
-            <AllPhotosTab
-              navigation={navigation}
-              eventId={eventId}
-              selectionMode={selectionMode}
-              selectedPhotos={selectedPhotos}
-              onPhotoSelect={handlePhotoSelect}
-            />
-          )}
-        </Tab.Screen>
-        <Tab.Screen
-          name="Faces"
-          options={{
-            tabBarIcon: () => (
-              <MaterialIcon name="people" size={24} color={colors.text} />
-            ),
-          }}
-        >
-          {() => (
-            <FacesTab
-              navigation={navigation}
-              eventId={eventId}
-              selectionMode={selectionMode}
-              selectedPhotos={selectedPhotos}
-              onPhotoSelect={handlePhotoSelect}
-            />
-          )}
-        </Tab.Screen>
-        <Tab.Screen
-          name="MyPhotos"
-          options={{
-            tabBarIcon: () => (
-              <MaterialIcon name="person" size={24} color={colors.text} />
-            ),
-          }}
-        >
-          {() => (
-            <MyPhotosTab
-              navigation={navigation}
-              eventId={eventId}
-              selectionMode={selectionMode}
-              selectedPhotos={selectedPhotos}
-              onPhotoSelect={handlePhotoSelect}
-            />
-          )}
-        </Tab.Screen>
-      </Tab.Navigator>
+      {renderCustomTabBar()}
+      <View style={styles.contentContainer}>{renderContent()}</View>
     </SafeAreaView>
   );
 };
@@ -298,11 +356,14 @@ const styles = StyleSheet.create({
   selectionCancelText: {
     marginLeft: 4,
     fontSize: 14,
-    color: '#666',
+  },
+  selectionCountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   selectionCount: {
     fontSize: 14,
-    color: '#1976d2',
     fontWeight: '500',
   },
   selectionDownloadButton: {
@@ -312,8 +373,53 @@ const styles = StyleSheet.create({
   selectionDownloadText: {
     marginLeft: 4,
     fontSize: 14,
-    color: '#1976d2',
     fontWeight: '500',
+  },
+  tabBarContainer: {
+    // borderWidth: 2,
+    // borderColor: 'pink',
+  },
+  tabScrollContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+  },
+  chipTab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 30,
+    borderWidth: 1,
+    gap: 8,
+    position: 'relative',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  tabIcon: {
+    marginRight: 2,
+  },
+  chipLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  activeIndicator: {
+    position: 'absolute',
+    bottom: -1,
+    left: '50%',
+    transform: [{ translateX: -4 }],
+    width: 8,
+    height: 3,
+    borderRadius: 1.5,
+  },
+  contentContainer: {
+    flex: 1,
   },
 });
 

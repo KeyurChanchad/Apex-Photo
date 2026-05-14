@@ -8,6 +8,8 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { ThemedView } from '../../components/common/ThemedView';
@@ -33,6 +35,7 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
     message: string;
     refId?: string;
   } | null>(null);
+  const { width } = Dimensions.get('window');
 
   // Validate name field
   const validateName = (name: string) => {
@@ -222,6 +225,17 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
+            {/* <View style={styles.logoContainer}>
+              <Image
+                source={require('../../assets/images/apexphoto_transparent.png')}
+                style={{
+                  width: width / 2,
+                  height: width / 2,
+                  transform: [{ translateX: 10 }],
+                }}
+                resizeMode="contain"
+              />
+            </View> */}
             {/* Header Section */}
             <View style={styles.header}>
               <ThemedText variant="h1" weight="bold" style={styles.title}>
@@ -529,7 +543,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingVertical: 8,
+  },
+  logoContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     marginBottom: 48,

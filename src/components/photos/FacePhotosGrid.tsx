@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
   RefreshControl,
   StyleSheet,
   View,
@@ -11,6 +10,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import { ThemedText } from '../common/ThemedText';
 import { useTheme } from '../../theme/ThemeContext';
 import FacePhotoCard from './FacePhotoCard';
+import { FlashList } from '@shopify/flash-list';
 
 const FacePhotosGrid: React.FC<{
   faces: Face[];
@@ -57,7 +57,7 @@ const FacePhotosGrid: React.FC<{
   }
 
   return (
-    <FlatList
+    <FlashList
       data={faces}
       renderItem={({ item }) => (
         <FacePhotoCard

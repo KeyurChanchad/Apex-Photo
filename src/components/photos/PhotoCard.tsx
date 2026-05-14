@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     margin: 6,
     borderRadius: 12,
-    overflow: 'hidden',
+    // overflow: 'hidden',
     backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -146,4 +146,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PhotoCard;
+export default React.memo(PhotoCard);

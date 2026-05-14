@@ -245,16 +245,17 @@ const FacesTab: React.FC<{
             hasNext={hasNext}
           />
           {/* Photo Viewer Overlay - Make sure it's at the end of your component */}
-          <PhotoViewer
-            visible={showPreview}
-            photoId={selectedPhoto?.photoId}
-            photoUrl={selectedPhoto?.photoUrl}
-            onClose={() => {
-              console.log('Closing photo viewer');
-              setShowPreview(false);
-              setSelectedPhoto(null);
-            }}
-          />
+          {showPreview && (
+            <PhotoViewer
+              visible={showPreview}
+              photoId={selectedPhoto?.photoId}
+              photoUrl={selectedPhoto?.photoUrl}
+              onClose={() => {
+                setShowPreview(false);
+                setSelectedPhoto(null);
+              }}
+            />
+          )}
         </View>
       ) : (
         <FacePhotosGrid

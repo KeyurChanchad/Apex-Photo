@@ -81,6 +81,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
       });
 
       const result = await download.promise;
+      console.log(result, filePath, photoUri);
 
       if (result.statusCode === 200) {
         Alert.alert(
