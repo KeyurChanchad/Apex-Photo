@@ -199,7 +199,7 @@ const FacesTab: React.FC<{
           >
             <View style={styles.headerContent}>
               <TouchableOpacity
-                onPress={() => navigation.goBack()}
+                onPress={() => setSelectedFaceId(null)}
                 style={styles.backButton}
               >
                 <MaterialIcons

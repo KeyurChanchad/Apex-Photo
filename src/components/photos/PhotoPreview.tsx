@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -59,7 +59,7 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
 
   const photoUri = photoUrl ? `${Config.PHOTO_URL}${photoUrl}` : '';
 
-  const handleDownload = async () => {
+  const handleDownload = useCallback(async () => {
     if (!photoId || !photoUri) {
       Alert.alert('Error', 'Photo information is missing');
       return;
@@ -100,9 +100,9 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
       setLoading(false);
       setDownloadProgress(0);
     }
-  };
+  }, [photoId, photoUri]);
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     if (!photoUri) {
       Alert.alert('Error', 'Photo URL is missing');
       return;
@@ -118,21 +118,21 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
       console.log('Share error:', error);
       Alert.alert('Error', 'Failed to share photo');
     }
-  };
+  }, [photoUri]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setModalVisible(false);
     if (onClose) {
       onClose();
     } else {
       navigation.goBack();
     }
-  };
+  }, [navigation, onClose]);
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     setImageError(false);
     setImageLoading(true);
-  };
+  }, []);
 
   return (
     <Modal

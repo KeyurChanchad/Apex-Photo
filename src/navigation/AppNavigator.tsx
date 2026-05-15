@@ -161,26 +161,6 @@ export const AppNavigator = () => {
       const token = await AsyncStorage.getItem('token');
       const deviceId = await AsyncStorage.getItem('deviceId');
 
-      // Example API call (uncomment and modify as needed)
-      /*
-      const response = await fetch('https://yourapi.com/check-auth', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      
-      if (response.ok && data.isAuthenticated) {
-        setIsAuthenticated(true);
-        setInitialRoute('Main');
-      } else {
-        setIsAuthenticated(false);
-        setInitialRoute('Auth');
-      }
-      */
-      console.log('token & device ', token, deviceId);
-
       // Simple check for demonstration
       if (token && deviceId) {
         setTimeout(() => {

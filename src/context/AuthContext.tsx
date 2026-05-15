@@ -41,27 +41,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
+  // useEffect(() => {
+  //   checkAuthStatus();
+  // }, []);
 
-  const checkAuthStatus = async () => {
-    try {
-      setLoading(true);
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const checkAuthStatus = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const token = await AsyncStorage.getItem('token');
+  //     if (token) {
+  //       console.log(api);
+
+  //       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  //     }
+  //   } catch (error) {
+  //     console.error('Auth check failed:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const registerDevice = async (data: DeviceRegisterRequest) => {
     try {
-      console.log('DeviceRegisterRequest data ', data);
       const response = await api.post('/CommonApi/DeviceRegistration', data);
       console.log('Device register successfully ', response.data);
 

@@ -52,7 +52,6 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
       const response: UserEventsResponse = await api.get(
         'PortfolioEventApi/UserEvents',
       );
-      console.log('res of user events ', response);
 
       if (response.statusCode === 200) setEvents(response.data);
     } catch (error) {
@@ -95,7 +94,7 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
       style={[
         styles.eventCard,
         {
-          backgroundColor: colors.backgroundSecondary,
+          backgroundColor: colors.background,
           shadowColor: colors.shadow,
         },
       ]}

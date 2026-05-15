@@ -28,6 +28,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     loadThemeMode();
 
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      console.log(colorScheme);
+
       if (themeMode === 'system') {
         forceUpdate();
       }

@@ -35,7 +35,6 @@ export const getAllPhotos = async (
   page = 1,
   pageSize = 20,
 ) => {
-  console.log('Get all photos ', eventId, page, pageSize);
   const response = await api.get(
     `/PortfolioEventApi/EventGallery?eventId=${eventId}&page=${page}&pageSize=${pageSize}`,
   );
@@ -165,7 +164,10 @@ export const downloadMultiplePhotos = async (photoIds: string[]) => {
   }
 
   try {
-    const response = await api.post('/photos/download-multiple', { photoIds });
+    const response = await api.post(
+      '/PortfolioEventApi/photos/download-multiple',
+      { photoIds },
+    );
     console.log('responseo of downlod mul ', response);
 
     Toast.show({

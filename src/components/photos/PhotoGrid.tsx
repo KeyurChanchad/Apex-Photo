@@ -88,7 +88,7 @@ const PhotosGrid: React.FC<{
           <ActivityIndicator
             color={colors.primary}
             size="large"
-            style={{ marginBottom: 20 }}
+            style={styles.footerLoading}
           />
         ) : null
       }
@@ -119,4 +119,5 @@ const styles = StyleSheet.create({
   gridContainer: {
     padding: 8,
   },
+  footerLoading: { marginBottom: 20 },
 });

@@ -40,8 +40,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
     <TouchableOpacity
       style={[
         styles.card,
-        selected && styles.selectedCard,
-        selected && { borderColor: colors.primary },
+        // selected && styles.selectedCard,
+        // selected && { borderColor: colors.primary },
       ]}
       onPress={onPress}
       activeOpacity={0.9}
@@ -54,7 +54,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
         )}
         <Image
           source={{ uri: photoUri }}
-          style={styles.image}
+          style={[styles.image, selected && styles.selectedImg]}
           onLoadStart={() => setImageLoading(true)}
           onLoadEnd={() => setImageLoading(false)}
           onError={() => {
@@ -94,21 +94,25 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
   },
   selectedCard: {
-    borderWidth: 2,
+    // borderWidth: 2,
+  },
+  selectedImg: {
+    opacity: 0.7,
   },
   imageContainer: {
     position: 'relative',
     width: '100%',
     height: CARD_WIDTH,
-    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
   },
   image: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    borderRadius: 12,
   },
   loaderContainer: {
     position: 'absolute',

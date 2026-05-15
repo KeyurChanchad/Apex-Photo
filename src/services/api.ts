@@ -178,7 +178,6 @@ const request = async <T = any>(
 
     // Parse JSON response
     const responseData = (await response.json().catch(() => ({}))) as T;
-    console.log('Response data ', responseData);
 
     // IMPLEMENT IF RESPONSE RETURN 401
     if (

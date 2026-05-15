@@ -18,7 +18,7 @@ import FacesTab from '../../components/photos/Faces';
 import { useTheme } from '../../theme/ThemeContext';
 
 // Tab configuration
-const TABS = [
+const TABS: { key: string; label: string; icon: string }[] = [
   {
     key: 'AllPhotos',
     label: 'All Photos',
@@ -40,11 +40,11 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
   route,
   navigation,
 }) => {
-  const { eventId, eventName } = route.params || {};
+  const { eventId, eventName, selectedTab } = route.params || {};
   const { colors } = useTheme();
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState('AllPhotos');
+  const [activeTab, setActiveTab] = useState(selectedTab ?? 'AllPhotos');
   const scrollViewRef = useRef<ScrollView>(null);
   const tabRefs = useRef<{ [key: string]: View | null }>({});
 
@@ -54,7 +54,6 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
     }
   }, [navigation, route.params]);
 
-  console.log(selectedPhotos, ' selected ids ');
   const handlePhotoSelect = useCallback(
     (photoId: string) => {
       if (selectedPhotos.includes(photoId)) {

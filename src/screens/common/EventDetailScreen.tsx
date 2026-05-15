@@ -62,12 +62,10 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const getEventDetail = useCallback(async () => {
     try {
       setIsLoading(true);
-      console.log('Getting detail....');
 
       const response: EventDetailResponse = await api.get(
         `/PortfolioEventApi/EventDetail?eventId=${eventId}`,
       );
-      console.log('response of detail ', response);
 
       if (response.data) {
         setEventData(response.data);
@@ -112,17 +110,16 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       eventId: eventData?.eventId,
       eventCode: eventData?.eventCode,
       eventName: eventData?.name,
+      selectedTab: 'AllPhotos',
     });
   };
 
   const handleMyFacePress = () => {
     navigation.navigate('PhotoGallery', {
-      screen: 'MyPhotos',
-      params: {
-        eventId: eventData?.eventId,
-        eventCode: eventData?.eventCode,
-        eventName: eventData?.name,
-      },
+      eventId: eventData?.eventId,
+      eventCode: eventData?.eventCode,
+      eventName: eventData?.name,
+      selectedTab: 'Faces',
     });
   };
 

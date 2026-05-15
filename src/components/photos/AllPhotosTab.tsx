@@ -36,7 +36,6 @@ const AllPhotosTab: React.FC<{
 
         if (!eventId) return;
         const response = await getAllPhotos(eventId, page);
-        console.log('Response of getall photos ', response);
 
         if (response.statusCode === 200) {
           if (isRefresh) {
