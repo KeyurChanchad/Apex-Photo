@@ -249,8 +249,12 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
       <ScrollView style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText style={styles.title}>Join Event</ThemedText>
-          <ThemedText style={styles.subtitle}>Enter code or scan QR</ThemedText>
+          <ThemedText variant="h4" style={styles.title}>
+            Join Event
+          </ThemedText>
+          <ThemedText variant="subtitle1" style={styles.subtitle}>
+            Enter code or scan QR
+          </ThemedText>
         </View>
 
         {/* Main QR Scan Card */}
@@ -262,7 +266,9 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
               color={colors.primary}
             />
           </View>
-          <ThemedText style={styles.scanTitle}>Scan QR Code</ThemedText>
+          <ThemedText variant="body1" style={styles.scanTitle}>
+            Scan QR Code
+          </ThemedText>
           <ThemedText
             variant="body2"
             style={styles.scanDescription}
@@ -290,14 +296,18 @@ export const JoinEventScreen: React.FC<{ navigation: any }> = ({
         {/* OR Divider */}
         <View style={styles.orContainer}>
           <View style={styles.orLine} />
-          <ThemedText style={styles.orText}>OR</ThemedText>
+          <ThemedText variant="caption" style={styles.orText}>
+            OR
+          </ThemedText>
           <View style={styles.orLine} />
         </View>
 
         {/* Event Code Input */}
         <View style={styles.inputContainer}>
           <View style={styles.labelContainer}>
-            <ThemedText style={styles.inputLabel}>Enter Event Code</ThemedText>
+            <ThemedText variant="body2" style={styles.inputLabel}>
+              Enter Event Code
+            </ThemedText>
           </View>
           <TextInput
             style={[
@@ -416,7 +426,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inputLabel: {
-    fontSize: 12,
+    // fontSize: 12,
     fontWeight: '600',
     letterSpacing: 1,
   },

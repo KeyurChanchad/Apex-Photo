@@ -3,12 +3,12 @@ import { useColorScheme, Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { lightColors, darkColors } from './colors';
 import {
-  textVariants,
   fontFamilies,
   fontSizes,
   fontWeights,
-  lineHeights,
   letterSpacing,
+  lineHeights,
+  typographyVariants,
 } from './typography';
 import { ThemeMode, ThemeContextType } from './types';
 
@@ -28,8 +28,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     loadThemeMode();
 
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      console.log(colorScheme);
-
       if (themeMode === 'system') {
         forceUpdate();
       }
@@ -101,7 +99,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         themeMode,
         colors,
         typography: {
-          variants: textVariants,
+          variants: typographyVariants,
           families: fontFamilies,
           sizes: fontSizes,
           weights: fontWeights,

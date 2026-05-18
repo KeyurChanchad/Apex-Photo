@@ -17,8 +17,7 @@ import { launchImageLibrary, PhotoQuality } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import CameraCapture from './CameraCapture';
 import PhotosGrid from './PhotoGrid';
-import { generateMockPhotos } from '../../utils/helper';
-import { scanPhoto, uploadPhoto } from '../../services/photoService';
+import { uploadPhoto } from '../../services/photoService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Photo {
@@ -234,8 +233,10 @@ export const FaceTabScreen: React.FC<{
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Header */}
       <View style={styles.header}>
-        <ThemedText style={styles.title}>Find Your Photos</ThemedText>
-        <ThemedText style={styles.subtitle}>
+        <ThemedText variant="h3" style={styles.title}>
+          Find Your Photos
+        </ThemedText>
+        <ThemedText variant="subtitle1" style={styles.subtitle}>
           Take a selfie and we'll find all your photos from the event
         </ThemedText>
       </View>
@@ -249,7 +250,7 @@ export const FaceTabScreen: React.FC<{
               size={64}
               color={colors.textSecondary}
             />
-            <ThemedText style={styles.placeholderText}>
+            <ThemedText variant="subtitle1" style={styles.placeholderText}>
               No selfie selected
             </ThemedText>
           </View>
@@ -260,7 +261,7 @@ export const FaceTabScreen: React.FC<{
               onPress={handleTakeSelfie}
             >
               <MaterialIcons name="camera" size={24} color={colors.white} />
-              <ThemedText style={styles.buttonOptionText}>
+              <ThemedText variant="body2" style={styles.buttonOptionText}>
                 Take Selfie
               </ThemedText>
             </TouchableOpacity>
@@ -274,7 +275,7 @@ export const FaceTabScreen: React.FC<{
                 size={24}
                 color={colors.white}
               />
-              <ThemedText style={styles.buttonOptionText}>
+              <ThemedText variant="body2" style={styles.buttonOptionText}>
                 Upload Photo
               </ThemedText>
             </TouchableOpacity>
@@ -294,13 +295,26 @@ export const FaceTabScreen: React.FC<{
               style={styles.retakeButton}
               onPress={handleRetake}
             >
-              <MaterialIcons name="refresh" size={20} color="#666666" />
-              <ThemedText style={styles.retakeText}>Retake/Change</ThemedText>
+              <MaterialIcons
+                name="refresh"
+                size={20}
+                color={colors.textSecondary}
+              />
+              <ThemedText variant="body3" style={styles.retakeText}>
+                Retake/Change
+              </ThemedText>
             </TouchableOpacity>
 
             <View style={styles.previewBadge}>
-              <MaterialIcons name="check-circle" size={20} color="#4CAF50" />
-              <ThemedText style={styles.previewBadgeText}>
+              <MaterialIcons
+                name="check-circle"
+                size={20}
+                color={colors.success}
+              />
+              <ThemedText
+                variant="body2"
+                style={[styles.previewBadgeText, { color: colors.success }]}
+              >
                 Selfie captured
               </ThemedText>
             </View>
@@ -323,7 +337,7 @@ export const FaceTabScreen: React.FC<{
       {/* Info Section */}
       <View style={styles.infoSection}>
         <MaterialIcons name="info-outline" size={20} color="#999999" />
-        <ThemedText style={styles.infoText}>
+        <ThemedText variant="caption" style={styles.infoText}>
           Your selfie will only be used to find your photos and won't be stored
           permanently
         </ThemedText>
@@ -443,9 +457,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   previewBadgeText: {
-    fontSize: 13,
-    color: '#4CAF50',
-    fontWeight: '500',
+    // fontSize: 13,
+    // color: '#4CAF50',
+    // fontWeight: '500',
   },
   findButton: {
     marginBottom: 20,

@@ -1,5 +1,12 @@
 import { lightColors } from './colors';
-import { textVariants, fontFamilies, fontSizes, fontWeights, lineHeights, letterSpacing} from './typography'
+import {
+  typographyVariants,
+  fontFamilies,
+  fontSizes,
+  fontWeights,
+  lineHeights,
+  letterSpacing,
+} from './typography';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -10,7 +17,7 @@ export interface ThemeContextType {
   themeMode: ThemeMode;
   colors: typeof lightColors;
   typography: {
-    variants: typeof textVariants;
+    variants: typeof typographyVariants;
     families: typeof fontFamilies;
     sizes: typeof fontSizes;
     weights: typeof fontWeights;

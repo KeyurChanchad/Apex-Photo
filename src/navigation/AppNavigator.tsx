@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+// navigation/AppNavigator.tsx
+import React, { useCallback, useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '../theme/ThemeContext';
@@ -19,6 +20,7 @@ import { navigationRef } from '../services/navigationService';
 
 const Stack = createNativeStackNavigator();
 
+// Main Stack Navigator (Authenticated screens)
 const MainStackNavigator = () => {
   const { colors, typography } = useTheme();
 
@@ -30,9 +32,8 @@ const MainStackNavigator = () => {
         },
         headerTitleStyle: {
           color: colors.headerTitle,
-          fontSize: typography.sizes.lg,
-          fontWeight: typography.weights.semibold,
-          fontFamily: typography.families.semibold,
+          fontSize: 18, // Fixed size instead of typography.sizes.lg
+          fontFamily: typography.families.spaceGroteskMedium, // Use Space Grotesk for headers
         },
         headerTintColor: colors.primary,
         contentStyle: {
@@ -50,6 +51,7 @@ const MainStackNavigator = () => {
         component={JoinEventScreen}
         options={{
           headerTitle: '',
+          headerBackTitle: 'Back',
         }}
       />
       <Stack.Screen
@@ -88,9 +90,8 @@ const AuthStackNavigator = () => {
         },
         headerTitleStyle: {
           color: colors.headerTitle,
-          fontSize: typography.sizes.lg,
-          fontWeight: typography.weights.semibold,
-          fontFamily: typography.families.semibold,
+          fontSize: 18,
+          fontFamily: typography.families.spaceGroteskMedium,
         },
         headerTintColor: colors.primary,
         contentStyle: {
@@ -106,7 +107,10 @@ const AuthStackNavigator = () => {
       <Stack.Screen
         name="OTPVerification"
         component={OTPVerificationScreen}
-        options={{ title: 'Verify OTP' }}
+        options={{
+          title: 'Verify OTP',
+          headerBackTitle: 'Back',
+        }}
       />
     </Stack.Navigator>
   );
@@ -117,51 +121,45 @@ export const AppNavigator = () => {
   const { colors, isDarkMode, typography } = useTheme();
   const { isAuthenticated, setIsAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const [initialRoute, setInitialRoute] = useState<String | null>(null);
+  const [initialRoute, setInitialRoute] = useState<string | null>(null);
 
-  // Create custom navigation theme
+  // Create React Navigation theme based on your app's theme
   const navigationTheme = {
     dark: isDarkMode,
     colors: {
       primary: colors.primary,
       background: colors.background,
-      card: colors.card,
+      card: colors.surface,
       text: colors.text,
       border: colors.border,
       notification: colors.primary,
     },
+    // Optional: Add fonts for navigation (uses Inter)
     fonts: {
       regular: {
-        fontFamily: typography.families.regular,
-        fontWeight: typography.weights.normal,
+        fontFamily: typography.families.interRegular,
+        fontWeight: '400' as const,
       },
       medium: {
-        fontFamily: typography.families.medium,
-        fontWeight: typography.weights.medium,
+        fontFamily: typography.families.interMedium,
+        fontWeight: '500' as const,
       },
       bold: {
-        fontFamily: typography.families.bold,
-        fontWeight: typography.weights.bold,
+        fontFamily: typography.families.interBold,
+        fontWeight: '700' as const,
       },
       heavy: {
-        fontFamily: typography.families.bold,
-        fontWeight: typography.weights.bold,
+        fontFamily: typography.families.interBold,
+        fontWeight: '800' as const,
       },
     },
   };
 
-  useEffect(() => {
-    checkRoute();
-  }, []);
-
-  const checkRoute = async () => {
+  const checkRoute = useCallback(async () => {
     try {
-      // Simulate API call or check authentication status
-      // You can replace this with your actual API call
       const token = await AsyncStorage.getItem('token');
       const deviceId = await AsyncStorage.getItem('deviceId');
 
-      // Simple check for demonstration
       if (token && deviceId) {
         setTimeout(() => {
           setIsLoading(false);
@@ -185,7 +183,11 @@ export const AppNavigator = () => {
       setInitialRoute(null);
       setIsAuthenticated(false);
     }
-  };
+  }, [setIsAuthenticated]);
+
+  useEffect(() => {
+    checkRoute();
+  }, [checkRoute]);
 
   // Show splash screen while loading
   if (isLoading || !initialRoute) {

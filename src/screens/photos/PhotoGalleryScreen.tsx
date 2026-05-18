@@ -158,6 +158,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
       >
         <MaterialIcon name="close" size={24} color={colors.textSecondary} />
         <ThemedText
+          variant="caption"
           style={[styles.selectionCancelText, { color: colors.textSecondary }]}
         >
           Cancel
@@ -165,7 +166,10 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
       </TouchableOpacity>
       <View style={styles.selectionCountContainer}>
         <MaterialIcon name="check-circle" size={20} color={colors.primary} />
-        <ThemedText style={[styles.selectionCount, { color: colors.primary }]}>
+        <ThemedText
+          variant="body1"
+          style={[styles.selectionCount, { color: colors.primary }]}
+        >
           {selectedPhotos.length} selected
         </ThemedText>
       </View>
@@ -175,6 +179,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
       >
         <MaterialIcon name="download" size={24} color={colors.primary} />
         <ThemedText
+          variant="body1"
           style={[styles.selectionDownloadText, { color: colors.primary }]}
         >
           Download
@@ -186,7 +191,7 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.headerTop}>
-        <ThemedText style={[styles.title, { color: colors.text }]}>
+        <ThemedText variant="h3" style={[styles.title, { color: colors.text }]}>
           {eventName}
         </ThemedText>
         {!selectionMode && (
@@ -244,15 +249,15 @@ const PhotoGalleryScreen: React.FC<{ route: any; navigation: any }> = ({
               <MaterialIcon
                 name={tab.icon}
                 size={20}
-                color={isActive ? '#FFFFFF' : colors.textSecondary}
+                color={isActive ? colors.white : colors.textSecondary}
                 style={styles.tabIcon}
               />
               <ThemedText
+                variant="body1"
                 style={[
                   styles.chipLabel,
-                  // eslint-disable-next-line react-native/no-inline-styles
                   {
-                    color: isActive ? '#FFFFFF' : colors.textSecondary,
+                    color: isActive ? colors.white : colors.textSecondary,
                   },
                 ]}
               >

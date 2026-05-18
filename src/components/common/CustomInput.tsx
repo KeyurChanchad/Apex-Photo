@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
   TextInputProps,
 } from 'react-native';
 import MaterialIcon from '@react-native-vector-icons/material-icons';
+import { ThemedText } from './ThemedText';
 
 interface CustomInputProps extends TextInputProps {
   label: string;
@@ -25,7 +25,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <ThemedText style={styles.label}>{label}</ThemedText>
       <View style={[styles.inputContainer, error && styles.inputError]}>
         <TextInput
           style={styles.input}
@@ -46,7 +46,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}
     </View>
   );
 };

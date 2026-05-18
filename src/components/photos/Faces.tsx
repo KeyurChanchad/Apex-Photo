@@ -17,13 +17,7 @@ const FacesTab: React.FC<{
   selectionMode: boolean;
   selectedPhotos: string[];
   onPhotoSelect: (photoId: string) => void;
-}> = ({
-  navigation,
-  eventId,
-  selectionMode,
-  selectedPhotos,
-  onPhotoSelect,
-}) => {
+}> = ({ eventId, selectionMode, selectedPhotos, onPhotoSelect }) => {
   const { colors } = useTheme();
   const [selectedFaceId, setSelectedFaceId] = useState<string | null>(null);
   const [faces, setFaces] = useState<Face[]>([]);
@@ -210,11 +204,14 @@ const FacesTab: React.FC<{
               </TouchableOpacity>
 
               <View style={styles.titleContainer}>
-                <ThemedText style={styles.title}>Match Found</ThemedText>
+                <ThemedText variant="h3" style={styles.title}>
+                  Match Found
+                </ThemedText>
                 <View style={styles.statsContainer}>
                   <ThemedText
+                    variant="body1"
                     style={[
-                      styles.totalPhotos,
+                      // styles.totalPhotos,
                       { color: colors.textSecondary },
                     ]}
                   >

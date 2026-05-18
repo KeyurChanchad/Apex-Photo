@@ -1,27 +1,26 @@
 export const lightColors = {
-  // Primary colors
-  primary: '#BE1838', //#BE1838
-  primaryLight: '#F24E68',
-  primaryDark: '#B8142F',
+  // Primary Brand
+  primary: '#E22446',
+  primaryDark: '#BE1838',
+  primaryLight: '#FCE4E8',
 
   // Secondary colors
   secondary: '#9C8F8A',
   secondaryLight: '#B5ABA7',
   secondaryDark: '#7D726E',
 
-  // Background colors
-  background: '#FFFFFF',
-  backgroundSecondary: '#F8F9FA',
-  surface: '#F8F9FA',
-  surfaceSecondary: '#F1F3F5',
+  // Background & Surfaces
+  background: '#F8F9FA',
+  backgroundSecondary: '#FFFFFF',
+  surface: '#FFFFFF',
+  surfaceElevated: '#F8F9FA',
 
-  // Text colors
-  text: '#000000',
+  // Text
+  text: '#212529',
   textSecondary: '#6C757D',
-  textTertiary: '#ADB5BD',
-  textInverse: '#FFFFFF',
+  textMuted: '#ADB5BD',
 
-  // Status colors
+  // Status (Backgrounds for alerts)
   error: '#DC3545',
   errorLight: '#FFE5E8',
   success: '#28A745',
@@ -31,9 +30,10 @@ export const lightColors = {
   info: '#17A2B8',
   infoLight: '#E1F5F8',
 
-  // Border and divider
-  border: '#DEE2E6',
-  divider: '#E9ECEF',
+  // Form & Borders
+  formBackground: '#F1F3F5',
+  border: '#E9ECEF',
+  borderFocus: '#E22446',
 
   // Shadow
   shadow: '#000000',
@@ -42,64 +42,51 @@ export const lightColors = {
   overlay: 'rgba(0, 0, 0, 0.5)',
   overlayLight: 'rgba(0, 0, 0, 0.1)',
 
-  // Card and component specific
-  card: '#FFFFFF',
-  input: '#FFFFFF',
-  inputBorder: '#DEE2E6',
-  inputPlaceholder: '#ADB5BD',
-  button: '#ED1A3C',
-  buttonText: '#FFFFFF',
-
-  // Tab bar
-  tabBar: '#FFFFFF',
-  tabBarActive: '#ED1A3C',
-  tabBarInactive: '#9C8F8A',
-
   // Header
   header: '#FFFFFF',
-  headerTitle: '#000000',
+  headerTitle: '#212529',
 
+  // Standard
   white: '#FFFFFF',
   black: '#000000',
 };
 
 export const darkColors = {
-  // Primary colors
+  // Primary Brand (keeping bright for accents)
   primary: '#E22446',
-  primaryLight: '#41191C',
-  primaryDark: '#41191C',
+  primaryDark: '#BE1838',
+  primaryLight: '#4A0D1A', // Dark mode highlight
 
   // Secondary colors
   secondary: '#9C8F8A',
   secondaryLight: '#B5ABA7',
   secondaryDark: '#7D726E',
 
-  // Background colors
-  background: '#211014',
-  backgroundSecondary: '#20181B',
-  surface: '#20181B',
-  surfaceSecondary: '#2C2C2E',
+  // Background & Surfaces
+  background: '#170F12', // Your specified deep background
+  backgroundSecondary: '#1E1719',
+  surface: '#1E1719',
+  surfaceElevated: '#2A2124',
 
-  // Text colors
+  // Text
   text: '#FFFFFF',
-  textSecondary: '#8E8E93',
-  textTertiary: '#636366',
-  textInverse: '#000000',
+  textSecondary: '#ADB5BD',
+  textMuted: '#6C757D',
 
-  // Status colors
-  error: '#FF453A',
-  errorLight: '#3A2020',
-  success: '#32D74B',
-  successLight: '#E3F5E8',
-  warning: '#FFD60A',
-  warningLight: '#3A3520',
-  info: '#64D2FF',
-  infoLight: '#1A2A35',
+  // Status (Dark mode backgrounds)
+  error: '#DC3545',
+  errorLight: '#4A141C',
+  success: '#28A745',
+  successLight: '#1A3B24',
+  warning: '#FFC107',
+  warningLight: '#3A3000',
+  info: '#17A2B8',
+  infoLight: '#0A3B42',
 
-  // Border and divider
-  border: '#38383A',
-  divider: '#2C2C2E',
-
+  // Form & Borders
+  formBackground: '#272023', // Your specified field BG
+  border: '#3A2E32',
+  borderFocus: '#E22446',
   // Shadow
   shadow: '#000000',
 
@@ -107,23 +94,11 @@ export const darkColors = {
   overlay: 'rgba(0, 0, 0, 0.8)',
   overlayLight: 'rgba(255, 255, 255, 0.1)',
 
-  // Card and component specific
-  card: '#1C1C1E',
-  input: '#1C1C1E',
-  inputBorder: '#38383A',
-  inputPlaceholder: '#636366',
-  button: '#ED1A3C',
-  buttonText: '#FFFFFF',
-
-  // Tab bar
-  tabBar: '#1C1C1E',
-  tabBarActive: '#ED1A3C',
-  tabBarInactive: '#9C8F8A',
-
   // Header
-  header: '#1C1C1E',
+  header: '#1C1C1E', // Your specified header
   headerTitle: '#FFFFFF',
 
+  // Standard
   white: '#FFFFFF',
   black: '#000000',
 };

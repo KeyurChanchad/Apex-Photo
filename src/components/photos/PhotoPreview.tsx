@@ -4,7 +4,6 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Text,
   Alert,
   Share,
   Modal,
@@ -16,6 +15,7 @@ import RNFS from 'react-native-fs';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Config from 'react-native-config';
+import { ThemedText } from '../common/ThemedText';
 
 const { width, height } = Dimensions.get('window');
 
@@ -81,7 +81,6 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
       });
 
       const result = await download.promise;
-      console.log(result, filePath, photoUri);
 
       if (result.statusCode === 200) {
         Alert.alert(
@@ -148,9 +147,11 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
           {/* Header with Close Button */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.closeBtn} onPress={handleClose}>
-              <Text style={styles.closeText}>✕</Text>
+              <ThemedText style={styles.closeText}>✕</ThemedText>
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Photo Viewer</Text>
+            <ThemedText variant="h4" style={styles.headerTitle}>
+              Photo Viewer
+            </ThemedText>
             <View style={styles.placeholder} />
           </View>
 
@@ -159,7 +160,9 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
             {imageLoading && !imageError && (
               <View style={styles.imageLoadingContainer}>
                 <ActivityIndicator size="large" color="#ffffff" />
-                <Text style={styles.loadingText}>Loading image...</Text>
+                <ThemedText variant="caption" style={styles.loadingText}>
+                  Loading image...
+                </ThemedText>
               </View>
             )}
 
@@ -181,9 +184,11 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
               />
             ) : (
               <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>Failed to load image</Text>
+                <ThemedText style={styles.errorText}>
+                  Failed to load image
+                </ThemedText>
                 <TouchableOpacity style={styles.retryBtn} onPress={handleRetry}>
-                  <Text style={styles.retryText}>Retry</Text>
+                  <ThemedText style={styles.retryText}>Retry</ThemedText>
                 </TouchableOpacity>
               </View>
             )}
@@ -194,9 +199,9 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
             <View style={styles.progressOverlay}>
               <View style={styles.progressContainer}>
                 <ActivityIndicator size="large" color="#ffffff" />
-                <Text style={styles.progressText}>
+                <ThemedText variant="caption" style={styles.progressText}>
                   Downloading... {Math.round(downloadProgress)}%
-                </Text>
+                </ThemedText>
                 <View style={styles.progressBar}>
                   <View
                     style={[
@@ -218,7 +223,9 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
                   onPress={handleDownload}
                   disabled={loading || imageError}
                 >
-                  <Text style={styles.buttonText}>Download</Text>
+                  <ThemedText variant="h4" style={styles.buttonText}>
+                    Download
+                  </ThemedText>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -229,7 +236,9 @@ export const PhotoViewer: React.FC<PhotoViewerProps> = ({
                   onPress={handleShare}
                   disabled={loading || imageError}
                 >
-                  <Text style={styles.buttonText}>Share</Text>
+                  <ThemedText variant="h4" style={styles.buttonText}>
+                    Share
+                  </ThemedText>
                 </TouchableOpacity>
               </View>
             </View>

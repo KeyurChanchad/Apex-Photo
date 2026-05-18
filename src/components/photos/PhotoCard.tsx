@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   Image,
   StyleSheet,
   TouchableOpacity,
@@ -12,6 +11,7 @@ import MaterialIcon from '@react-native-vector-icons/material-icons';
 import { Photo } from '../../types/photo.types';
 import Config from 'react-native-config';
 import { useTheme } from '../../theme/ThemeContext';
+import { ThemedText } from '../common/ThemedText';
 
 interface PhotoCardProps {
   photo: Photo;
@@ -65,7 +65,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
         {imageError && (
           <View style={styles.errorContainer}>
             <MaterialIcon name="broken-image" size={40} color="#ccc" />
-            <Text style={styles.errorText}>Failed to load</Text>
+            <ThemedText style={styles.errorText}>Failed to load</ThemedText>
           </View>
         )}
       </View>

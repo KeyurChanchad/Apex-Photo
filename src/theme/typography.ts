@@ -1,18 +1,24 @@
-import { Platform } from 'react-native';
+import { TextStyle } from 'react-native';
 
 // Font families
 export const fontFamilies = {
   // Default system fonts (no custom fonts needed)
-  regular: Platform.OS === 'ios' ? 'System' : 'Roboto',
-  medium: Platform.OS === 'ios' ? 'System' : 'Roboto',
-  semibold: Platform.OS === 'ios' ? 'System' : 'Roboto',
-  bold: Platform.OS === 'ios' ? 'System' : 'Roboto',
-  
+  // regular: Platform.OS === 'ios' ? 'System' : 'Roboto',
+  // medium: Platform.OS === 'ios' ? 'System' : 'Roboto',
+  // semibold: Platform.OS === 'ios' ? 'System' : 'Roboto',
+  // bold: Platform.OS === 'ios' ? 'System' : 'Roboto',
+
   // If you have custom fonts, uncomment and use:
-  // regular: 'Poppins-Regular',
-  // medium: 'Poppins-Medium',
-  // semibold: 'Poppins-SemiBold',
-  // bold: 'Poppins-Bold',
+  // Inter for body text
+  interLight: 'InterLight',
+  interRegular: 'InterRegular',
+  interMedium: 'InterMedium',
+  interBold: 'InterBold',
+
+  // Space Grotesk for headers
+  spaceGroteskRegular: 'SpaceGroteskRegular',
+  spaceGroteskMedium: 'SpaceGroteskMedium',
+  spaceGroteskBold: 'SpaceGroteskBold',
 };
 
 // Font sizes
@@ -43,18 +49,16 @@ export const lineHeights = {
   '5xl': 48,
 };
 
-// Font weights
-export const fontWeights = {
-  thin: '100',
-  extralight: '200',
+// Font weights mapping
+export type FontWeight = 'light' | 'regular' | 'medium' | 'bold' | 'semibold';
+
+export const fontWeights: Record<FontWeight, TextStyle['fontWeight']> = {
   light: '300',
-  normal: '400',
+  regular: '400',
   medium: '500',
   semibold: '600',
   bold: '700',
-  extrabold: '800',
-  black: '900',
-} as const;
+};
 
 // Letter spacing
 export const letterSpacing = {
@@ -67,95 +71,103 @@ export const letterSpacing = {
 };
 
 // Text variants
-export const textVariants = {
-  // Heading styles
+export type TextVariant =
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'subtitle1'
+  | 'subtitle2'
+  | 'body1'
+  | 'body2'
+  | 'body3'
+  | 'button'
+  | 'caption'
+  | 'overline';
+
+// Map variants to their styles (using Space Grotesk for headers, Inter for body)
+export const typographyVariants: Record<TextVariant, TextStyle> = {
+  // Headers - Space Grotesk Bold
   h1: {
-    fontSize: fontSizes['5xl'],
-    fontWeight: fontWeights.bold,
-    lineHeight: lineHeights['5xl'],
-    letterSpacing: letterSpacing.tight,
+    fontFamily: fontFamilies.spaceGroteskBold,
+    fontSize: 32,
+    lineHeight: 40,
+    letterSpacing: -0.5,
   },
   h2: {
-    fontSize: fontSizes['4xl'],
-    fontWeight: fontWeights.bold,
-    lineHeight: lineHeights['4xl'],
-    letterSpacing: letterSpacing.tight,
+    fontFamily: fontFamilies.spaceGroteskBold,
+    fontSize: 28,
+    lineHeight: 36,
+    letterSpacing: -0.3,
   },
   h3: {
-    fontSize: fontSizes['3xl'],
-    fontWeight: fontWeights.semibold,
-    lineHeight: lineHeights['3xl'],
+    fontFamily: fontFamilies.spaceGroteskBold,
+    fontSize: 24,
+    lineHeight: 32,
   },
   h4: {
-    fontSize: fontSizes['2xl'],
-    fontWeight: fontWeights.semibold,
-    lineHeight: lineHeights['2xl'],
+    fontFamily: fontFamilies.spaceGroteskBold,
+    fontSize: 20,
+    lineHeight: 28,
   },
-  h5: {
-    fontSize: fontSizes.xl,
-    fontWeight: fontWeights.semibold,
-    lineHeight: lineHeights.xl,
+
+  // Subtitles - Space Grotesk Medium
+  subtitle1: {
+    fontFamily: fontFamilies.spaceGroteskMedium,
+    fontSize: 18,
+    lineHeight: 26,
   },
-  h6: {
-    fontSize: fontSizes.lg,
-    fontWeight: fontWeights.semibold,
-    lineHeight: lineHeights.lg,
+  subtitle2: {
+    fontFamily: fontFamilies.spaceGroteskMedium,
+    fontSize: 16,
+    lineHeight: 24,
   },
-  
-  // Body styles
+
+  // Body - Inter Regular/Medium
   body1: {
-    fontSize: fontSizes.base,
-    fontWeight: fontWeights.normal,
-    lineHeight: lineHeights.base,
+    fontFamily: fontFamilies.interRegular,
+    fontSize: 16,
+    lineHeight: 24,
   },
   body2: {
-    fontSize: fontSizes.md,
-    fontWeight: fontWeights.normal,
-    lineHeight: lineHeights.md,
+    fontFamily: fontFamilies.interRegular,
+    fontSize: 14,
+    lineHeight: 20,
   },
   body3: {
-    fontSize: fontSizes.sm,
-    fontWeight: fontWeights.normal,
-    lineHeight: lineHeights.sm,
+    fontFamily: fontFamilies.interRegular,
+    fontSize: 12,
+    lineHeight: 16,
   },
-  
-  // Caption styles
-  caption: {
-    fontSize: fontSizes.xs,
-    fontWeight: fontWeights.normal,
-    lineHeight: lineHeights.xs,
-  },
-  
-  // Button styles
+
+  // Button - Inter Medium
   button: {
-    fontSize: fontSizes.base,
-    fontWeight: fontWeights.semibold,
-    letterSpacing: letterSpacing.wide,
+    fontFamily: fontFamilies.interMedium,
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '500',
   },
-  buttonSmall: {
-    fontSize: fontSizes.sm,
-    fontWeight: fontWeights.medium,
-    letterSpacing: letterSpacing.wide,
+
+  // Caption - Inter Regular
+  caption: {
+    fontFamily: fontFamilies.interRegular,
+    fontSize: 12,
+    lineHeight: 16,
   },
-  buttonLarge: {
-    fontSize: fontSizes.lg,
-    fontWeight: fontWeights.semibold,
-    letterSpacing: letterSpacing.wide,
-  },
-  
-  // Label styles
-  label: {
-    fontSize: fontSizes.sm,
-    fontWeight: fontWeights.medium,
-  },
-  
-  // Error text
-  error: {
-    fontSize: fontSizes.xs,
-    fontWeight: fontWeights.normal,
+
+  // Overline - Inter Bold
+  overline: {
+    fontFamily: fontFamilies.interBold,
+    fontSize: 10,
+    lineHeight: 14,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 };
 
-export type TextVariant = keyof typeof textVariants;
-export type FontWeight = keyof typeof fontWeights;
 export type FontSize = keyof typeof fontSizes;
+
+// Get variant style helper
+export const getVariantStyle = (variant: TextVariant): TextStyle => {
+  return typographyVariants[variant];
+};

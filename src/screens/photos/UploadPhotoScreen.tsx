@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   Image,
   ScrollView,
-  Alert,
-  ActivityIndicator,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import MaterialIcon from '@react-native-vector-icons/material-icons';
@@ -15,6 +12,7 @@ import CustomButton from '../../components/common/CustomButton';
 import CameraModal from '../../components/photos/CameraModal';
 import photoService from '../../services/photoService';
 import Toast from 'react-native-toast-message';
+import { ThemedText } from '../../components/common/ThemedText';
 
 const UploadPhotoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -28,11 +26,11 @@ const UploadPhotoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         quality: 0.8,
         includeBase64: false,
       },
-      (response) => {
+      response => {
         if (response.assets && response.assets[0]) {
           setSelectedImage(response.assets[0].uri || null);
         }
-      }
+      },
     );
   };
 
@@ -66,7 +64,8 @@ const UploadPhotoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         text2: 'Your photo has been uploaded',
       });
       navigation.goBack();
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Error to upload photo ', error);
       Toast.show({
         type: 'error',
         text1: 'Upload Failed',
@@ -80,8 +79,10 @@ const UploadPhotoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Upload Photo</Text>
-        <Text style={styles.subtitle}>Choose from gallery or take a selfie</Text>
+        <ThemedText style={styles.title}>Upload Photo</ThemedText>
+        <ThemedText style={styles.subtitle}>
+          Choose from gallery or take a selfie
+        </ThemedText>
       </View>
 
       <View style={styles.imageContainer}>
@@ -90,7 +91,9 @@ const UploadPhotoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         ) : (
           <View style={styles.placeholderContainer}>
             <MaterialIcon name="photo-camera" size={80} color="#ccc" />
-            <Text style={styles.placeholderText}>No photo selected</Text>
+            <ThemedText style={styles.placeholderText}>
+              No photo selected
+            </ThemedText>
           </View>
         )}
       </View>
@@ -98,12 +101,17 @@ const UploadPhotoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.galleryButton} onPress={openGallery}>
           <MaterialIcon name="photo-library" size={24} color="#1976d2" />
-          <Text style={styles.galleryButtonText}>Choose from Gallery</Text>
+          <ThemedText style={styles.galleryButtonText}>
+            Choose from Gallery
+          </ThemedText>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cameraButton} onPress={() => setShowCamera(true)}>
+        <TouchableOpacity
+          style={styles.cameraButton}
+          onPress={() => setShowCamera(true)}
+        >
           <MaterialIcon name="camera-alt" size={24} color="#fff" />
-          <Text style={styles.cameraButtonText}>Take Selfie</Text>
+          <ThemedText style={styles.cameraButtonText}>Take Selfie</ThemedText>
         </TouchableOpacity>
       </View>
 

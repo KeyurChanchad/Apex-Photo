@@ -1,20 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-  Alert,
-  Platform,
-} from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
 import {
   Camera,
   useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
 import MaterialIcon from '@react-native-vector-icons/material-icons';
-import { usePermission } from '../../hooks/usePermission';
+import { ThemedText } from '../common/ThemedText';
 
 interface CameraModalProps {
   visible: boolean;
@@ -27,21 +19,16 @@ const CameraModal: React.FC<CameraModalProps> = ({
   onClose,
   onPhotoCapture,
 }) => {
-  const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>('back');
+  const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>(
+    'back',
+  );
   const [flash, setFlash] = useState<'off' | 'on'>('off');
   const cameraRef = useRef<Camera>(null);
-  
+
   const device = useCameraDevice(cameraPosition);
   const { hasPermission, requestPermission } = useCameraPermission();
-  const { hasPermission: hasStoragePermission, requestPermission: requestStoragePermission } = usePermission('storage');
 
-  useEffect(() => {
-    if (visible) {
-      initializeCamera();
-    }
-  }, [visible]);
-
-  const initializeCamera = async () => {
+  const initializeCamera = useCallback(async () => {
     if (!hasPermission) {
       const permission = await requestPermission();
       if (!permission) {
@@ -51,11 +38,17 @@ const CameraModal: React.FC<CameraModalProps> = ({
           [
             { text: 'Cancel', style: 'cancel', onPress: onClose },
             { text: 'Grant Permission', onPress: initializeCamera },
-          ]
+          ],
         );
       }
     }
-  };
+  }, [hasPermission, requestPermission, onClose]);
+
+  useEffect(() => {
+    if (visible) {
+      initializeCamera();
+    }
+  }, [visible, initializeCamera]);
 
   const takePhoto = async () => {
     if (cameraRef.current && device) {
@@ -85,9 +78,11 @@ const CameraModal: React.FC<CameraModalProps> = ({
       <Modal visible={visible} transparent animationType="slide">
         <View style={styles.centerContainer}>
           <MaterialIcon name="warning" size={60} color="#fff" />
-          <Text style={styles.errorText}>No camera device available</Text>
+          <ThemedText style={styles.errorText}>
+            No camera device available
+          </ThemedText>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            <ThemedText style={styles.closeButtonText}>Close</ThemedText>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -99,9 +94,16 @@ const CameraModal: React.FC<CameraModalProps> = ({
       <Modal visible={visible} transparent animationType="slide">
         <View style={styles.centerContainer}>
           <MaterialIcon name="lock" size={60} color="#fff" />
-          <Text style={styles.errorText}>Camera permission denied</Text>
-          <TouchableOpacity onPress={initializeCamera} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Grant Permission</Text>
+          <ThemedText style={styles.errorText}>
+            Camera permission denied
+          </ThemedText>
+          <TouchableOpacity
+            onPress={initializeCamera}
+            style={styles.closeButton}
+          >
+            <ThemedText style={styles.closeButtonText}>
+              Grant Permission
+            </ThemedText>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -118,21 +120,24 @@ const CameraModal: React.FC<CameraModalProps> = ({
           isActive={visible}
           photo={true}
         />
-        
+
         <View style={styles.controls}>
           <TouchableOpacity onPress={onClose} style={styles.controlButton}>
             <MaterialIcon name="close" size={30} color="#fff" />
           </TouchableOpacity>
-          
+
           <TouchableOpacity onPress={takePhoto} style={styles.captureButton}>
             <View style={styles.captureButtonInner} />
           </TouchableOpacity>
-          
-          <TouchableOpacity onPress={toggleCameraPosition} style={styles.controlButton}>
+
+          <TouchableOpacity
+            onPress={toggleCameraPosition}
+            style={styles.controlButton}
+          >
             <MaterialIcon name="flip-camera-ios" size={30} color="#fff" />
           </TouchableOpacity>
         </View>
-        
+
         <TouchableOpacity onPress={toggleFlash} style={styles.flashButton}>
           <MaterialIcon
             name={flash === 'on' ? 'flash-on' : 'flash-off'}

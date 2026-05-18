@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Image,
@@ -10,6 +10,7 @@ import { ThemedText } from '../../components/common/ThemedText';
 import { useTheme } from '../../theme/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useDeviceInfo } from '../../hooks/useDeviceInfo';
+import { version } from '../../../package.json';
 
 export const SplashScreen: React.FC<{ onFinish: () => void }> = ({
   onFinish,
@@ -20,6 +21,23 @@ export const SplashScreen: React.FC<{ onFinish: () => void }> = ({
   const [fadeAnim] = useState(new Animated.Value(0));
   const [scaleAnim] = useState(new Animated.Value(0.8));
   const [error, setError] = useState<string | null>(null);
+
+  const initializeApp = useCallback(async () => {
+    try {
+      // Step 1: Register device
+      const deviceInfo = await getDeviceInfo();
+      await registerDevice(deviceInfo);
+
+      // Small delay for smooth transition
+      setTimeout(() => {
+        // Finish splash screen
+        onFinish();
+      }, 1500);
+    } catch (error: unknown) {
+      console.error('Initialization error:', error);
+      setError('Failed to initialize app');
+    }
+  }, [getDeviceInfo, onFinish, registerDevice]);
 
   useEffect(() => {
     // Start animations
@@ -38,24 +56,7 @@ export const SplashScreen: React.FC<{ onFinish: () => void }> = ({
 
     // Initialize app
     initializeApp();
-  }, []);
-
-  const initializeApp = async () => {
-    try {
-      // Step 1: Register device
-      const deviceInfo = await getDeviceInfo();
-      await registerDevice(deviceInfo);
-
-      // Small delay for smooth transition
-      setTimeout(() => {
-        // Finish splash screen
-        onFinish();
-      }, 1500);
-    } catch (error) {
-      console.error('Initialization error:', error);
-      setError('Failed to initialize app');
-    }
-  };
+  }, [fadeAnim, scaleAnim, initializeApp]);
 
   return (
     <View style={[styles.container]}>
@@ -79,14 +80,14 @@ export const SplashScreen: React.FC<{ onFinish: () => void }> = ({
         <ThemedText
           variant="h1"
           weight="bold"
-          style={[styles.appName, { color: '#FFFFFF' }]}
+          style={[styles.appName, { color: colors.white }]}
         >
           Event Face Finder
         </ThemedText>
 
         <ThemedText
           variant="body2"
-          style={[styles.tagline, { color: '#FFFFFF' }]}
+          style={[styles.tagline, { color: colors.white }]}
         >
           Your memories, beautifully organized
         </ThemedText>
@@ -94,16 +95,12 @@ export const SplashScreen: React.FC<{ onFinish: () => void }> = ({
 
       <View style={styles.bottomContainer}>
         {!error && <ActivityIndicator size="large" color="#FFFFFF" />}
-        {error && (
-          <ThemedText style={[styles.errorText, { color: '#FFE5E5' }]}>
-            {error}
-          </ThemedText>
-        )}
+        {error && <ThemedText style={[styles.errorText]}>{error}</ThemedText>}
         <ThemedText
           variant="caption"
-          style={[styles.versionText, { color: '#FFFFFF' }]}
+          style={[styles.versionText, { color: colors.white }]}
         >
-          Version 1.0.0
+          Version {version}
         </ThemedText>
       </View>
     </View>
@@ -121,10 +118,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   logoWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,

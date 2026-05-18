@@ -8,8 +8,6 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
-  Image,
-  Dimensions,
 } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { ThemedView } from '../../components/common/ThemedView';
@@ -35,7 +33,6 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
     message: string;
     refId?: string;
   } | null>(null);
-  const { width } = Dimensions.get('window');
 
   // Validate name field
   const validateName = (name: string) => {
@@ -254,11 +251,14 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
                   { backgroundColor: colors.errorLight },
                 ]}
               >
-                <ThemedText style={[styles.errorText, { color: colors.error }]}>
+                <ThemedText
+                  variant="body1"
+                  style={[styles.errorText, { color: colors.error }]}
+                >
                   {error}
                 </ThemedText>
                 <TouchableOpacity onPress={clearError}>
-                  <ThemedText style={{ color: colors.primary }}>
+                  <ThemedText variant="body1" style={{ color: colors.primary }}>
                     Dismiss
                   </ThemedText>
                 </TouchableOpacity>
@@ -288,8 +288,8 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
                       styles.verificationTitle,
                       {
                         color: verificationResult.success
-                          ? '#155724'
-                          : '#721c24',
+                          ? colors.success
+                          : colors.error,
                       },
                     ]}
                   >
@@ -302,7 +302,9 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
                   style={[
                     styles.verificationMessage,
                     {
-                      color: verificationResult.success ? '#155724' : '#721c24',
+                      color: verificationResult.success
+                        ? colors.success
+                        : colors.error,
                     },
                   ]}
                 >
@@ -413,7 +415,7 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
                     styles.sendOtpButton,
                     {
                       backgroundColor: disabledBtn
-                        ? colors.textTertiary
+                        ? colors.text
                         : colors.primary,
                     },
                     loginLoading && styles.buttonDisabled,
@@ -448,6 +450,7 @@ export const LoginScreen: React.FC = ({ navigation }: any) => {
                       />
                     )}
                     <ThemedText
+                      variant="h4"
                       style={[
                         styles.buttonText,
                         {

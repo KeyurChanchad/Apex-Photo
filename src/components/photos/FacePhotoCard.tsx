@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   Image,
   StyleSheet,
   TouchableOpacity,
@@ -55,7 +54,7 @@ const FacePhotoCard: React.FC<PhotoCardProps> = ({ photo, onPress }) => {
         {imageError && (
           <View style={styles.errorContainer}>
             <MaterialIcon name="broken-image" size={40} color="#ccc" />
-            <Text style={styles.errorText}>Failed to load</Text>
+            <ThemedText style={styles.errorText}>Failed to load</ThemedText>
           </View>
         )}
       </View>

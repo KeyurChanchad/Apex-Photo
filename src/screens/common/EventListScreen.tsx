@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
@@ -19,6 +18,7 @@ import MaterialIcons from '@react-native-vector-icons/material-icons';
 import api from '../../services/api';
 import { getStatusName } from '../../utils/helper';
 import { FlashList } from '@shopify/flash-list';
+import { ThemedText } from '../../components/common/ThemedText';
 
 const EmptyListComponent = () => {
   const { colors } = useTheme();
@@ -30,12 +30,14 @@ const EmptyListComponent = () => {
         color={colors.error}
         style={{ paddingBottom: 14 }}
       />
-      <Text style={[styles.emptyText, { color: colors.text }]}>
+      <ThemedText style={[styles.emptyText, { color: colors.text }]}>
         No events joined yet
-      </Text>
-      <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
+      </ThemedText>
+      <ThemedText
+        style={[styles.emptySubtext, { color: colors.textSecondary }]}
+      >
         Join an event using a code or QR scan to get started.
-      </Text>
+      </ThemedText>
     </View>
   );
 };
@@ -103,33 +105,40 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
       }
     >
       <View style={styles.eventHeader}>
-        <Text style={[styles.eventName, { color: colors.text }]}>
+        <ThemedText variant="body1" style={[styles.eventName]}>
           {item.eventName}
-        </Text>
+        </ThemedText>
         <View
           style={[
             styles.statusBadge,
             { backgroundColor: getStatusColor(item.eventStatus) + '20' },
           ]}
         >
-          <Text
+          <ThemedText
+            variant="caption"
             style={[
               styles.statusText,
               { color: getStatusColor(item.eventStatus) },
             ]}
           >
             {getStatusName(item.eventStatus)}
-          </Text>
+          </ThemedText>
         </View>
       </View>
 
       <View style={styles.eventDetails}>
-        <Text style={[styles.eventNumber, { color: colors.primary }]}>
+        <ThemedText
+          variant="body3"
+          style={[styles.eventNumber, { color: colors.primary }]}
+        >
           # {item.eventCode}
-        </Text>
-        <Text style={[styles.eventDate, { color: colors.textSecondary }]}>
+        </ThemedText>
+        <ThemedText
+          variant="body2"
+          style={[styles.eventDate, { color: colors.textSecondary }]}
+        >
           {new Date(item.eventDate).toDateString()}
-        </Text>
+        </ThemedText>
       </View>
     </Pressable>
   );
@@ -163,9 +172,12 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
           },
         ]}
       >
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
+        <ThemedText
+          variant="h3"
+          // style={[styles.headerTitle, { color: colors.text }]}
+        >
           My Events
-        </Text>
+        </ThemedText>
       </View>
 
       <FlashList
@@ -197,9 +209,12 @@ const EventListScreen = ({ navigation }: { navigation: any }) => {
           activeOpacity={0.8}
         >
           <MaterialIcons name="add-circle" size={20} color={colors.white} />
-          <Text style={[styles.joinButtonText, { color: colors.white }]}>
+          <ThemedText
+            variant="h4"
+            style={[styles.joinButtonText, { color: colors.white }]}
+          >
             Join New Event
-          </Text>
+          </ThemedText>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -258,7 +273,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   eventNumber: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '500',
   },
   eventDate: {

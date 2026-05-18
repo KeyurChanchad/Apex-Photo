@@ -2,18 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	 <!-- Camera Usage - Required for taking photos -->
-    <key>NSCameraUsageDescription</key>
-    <string>This app needs camera access to take event photos and selfies</string>
-    
-    <!-- Photo Library Usage - Required for saving and selecting photos -->
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app needs access to photo library to save downloaded photos and select images to upload</string>
-    
-    <!-- Photo Library Additions - Required for saving photos -->
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>This app needs permission to save photos to your library</string>
-
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to take event photos and selfies</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo library to save downloaded photos and select images to upload</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs permission to save photos to your library</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -68,5 +62,15 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>InterMedium.ttf</string>
+		<string>InterLight.ttf</string>
+		<string>SpaceGroteskMedium.ttf</string>
+		<string>InterRegular.ttf</string>
+		<string>SpaceGroteskRegular.ttf</string>
+		<string>InterBold.ttf</string>
+		<string>SpaceGroteskBold.ttf</string>
+	</array>
 </dict>
 </plist>

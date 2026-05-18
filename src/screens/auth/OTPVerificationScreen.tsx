@@ -21,6 +21,7 @@ interface OTPVerificationScreenProps {
       countryCode: string;
       mobileNumber: string;
       refId: string;
+      fullName: string;
     };
   };
   navigation: any;
@@ -32,7 +33,7 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const { verifyOTP, verifyMobileNo, loading } = useAuth();
-  const { countryCode, mobileNumber, refId } = route.params;
+  const { countryCode, mobileNumber, refId, fullName } = route.params;
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
@@ -62,6 +63,8 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
   };
 
   const handleKeyPress = (e: any, index: number) => {
+    console.log('otp ', { otp, index });
+
     if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -105,7 +108,7 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
 
   const handleResend = async () => {
     try {
-      await verifyMobileNo(countryCode, mobileNumber);
+      await verifyMobileNo(countryCode, mobileNumber, fullName);
       setTimer(60);
       setCanResend(false);
       Toast.show({
@@ -146,8 +149,8 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
               style={[
                 styles.otpInput,
                 {
-                  backgroundColor: colors.input,
-                  borderColor: colors.inputBorder,
+                  backgroundColor: colors.formBackground,
+                  borderColor: colors.border,
                   color: colors.text,
                 },
               ]}
@@ -170,7 +173,9 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
         {/* OR Divider */}
         <View style={styles.orContainer}>
           <View style={styles.orLine} />
-          <ThemedText style={styles.orText}>OR</ThemedText>
+          <ThemedText variant="subtitle1" style={styles.orText}>
+            OR
+          </ThemedText>
           <View style={styles.orLine} />
         </View>
 
@@ -180,11 +185,13 @@ export const OTPVerificationScreen: React.FC<OTPVerificationScreenProps> = ({
               navigation.goBack();
             }}
           >
-            <ThemedText color={'secondary'}>Change Number</ThemedText>
+            <ThemedText variant="body2" color={'secondary'}>
+              Change Number
+            </ThemedText>
           </Pressable>
           <View style={styles.resendContainer}>
             {!canResend ? (
-              <ThemedText variant="body1" style={{ fontWeight: '400' }}>
+              <ThemedText variant="body2" style={{ fontWeight: '400' }}>
                 Resend code in {timer} seconds
               </ThemedText>
             ) : (

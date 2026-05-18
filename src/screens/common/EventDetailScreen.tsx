@@ -182,6 +182,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     color={colors.primaryDark}
                   />
                   <ThemedText
+                    variant="body3"
                     style={[styles.dateText, { color: colors.textSecondary }]}
                   >
                     {new Date(eventData.eventDate).toDateString()}
@@ -199,6 +200,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   ]}
                 >
                   <ThemedText
+                    variant="caption"
                     style={[
                       styles.statusText,
                       { color: getStatusColor(eventData.eventStatus) },
@@ -222,6 +224,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             >
               {/* EVENT CODE Label */}
               <ThemedText
+                variant="body3"
                 style={[styles.cardTitle, { color: colors.textSecondary }]}
               >
                 EVENT CODE
@@ -261,6 +264,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               ]}
             >
               <ThemedText
+                variant="body3"
                 style={[styles.cardTitle, { color: colors.textSecondary }]}
               >
                 SCAN TO JOIN EVENT
@@ -314,6 +318,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               ]}
             >
               <ThemedText
+                variant="body3"
                 style={[styles.cardTitle, { color: colors.textSecondary }]}
               >
                 {' '}
@@ -328,7 +333,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   paddingVertical: 6,
                 }}
               >
-                <ThemedText style={{ opacity: 0.7 }}>
+                <ThemedText variant="body1" style={{ opacity: 0.7 }}>
                   https://localhost:7286/Portfolio/EventCode?code=HK20260703
                 </ThemedText>
               </View>
@@ -386,6 +391,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   color={colors.white}
                 />
                 <ThemedText
+                  variant="h4"
                   style={[styles.navButtonText, { color: colors.white }]}
                 >
                   Gallery
@@ -402,6 +408,7 @@ const EventDetailScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               >
                 <MaterialIcons name="face" size={24} color={colors.primary} />
                 <ThemedText
+                  variant="h4"
                   style={[styles.navButtonText, { color: colors.primary }]}
                 >
                   My Face
@@ -451,7 +458,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     fontWeight: '600',
-    letterSpacing: 1,
+    // letterSpacing: 1,
     textTransform: 'uppercase',
   },
   codeValue: {

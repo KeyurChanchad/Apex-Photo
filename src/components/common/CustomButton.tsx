@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   TouchableOpacity,
-  Text,
   StyleSheet,
   ActivityIndicator,
   ViewStyle,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import MaterialIcons from '@react-native-vector-icons/material-icons';
+import { ThemedText } from './ThemedText';
 
 interface CustomButtonProps {
   title: string;
@@ -97,9 +97,12 @@ const CustomButton: React.FC<CustomButtonProps> = ({
               style={{ marginRight: 2 }}
             />
           )}
-          <Text style={[styles.buttonText, getTextStyle(), textStyle]}>
+          <ThemedText
+            variant="h4"
+            style={[styles.buttonText, getTextStyle(), textStyle]}
+          >
             {title}
-          </Text>
+          </ThemedText>
           {rightIcon && (
             <MaterialIcons
               name={rightIcon || 'arrow-right-alt'}

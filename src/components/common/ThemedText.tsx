@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TextProps, StyleSheet } from 'react-native';
+import { Text, TextProps } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { TextVariant, FontWeight } from '../../theme/typography';
 
@@ -12,7 +12,9 @@ interface ThemedTextProps extends TextProps {
     | 'tertiary'
     | 'inverse'
     | 'error'
-    | 'success';
+    | 'success'
+    | 'warning'
+    | 'info';
   weight?: FontWeight;
   align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
 }
@@ -36,13 +38,15 @@ export const ThemedText: React.FC<ThemedTextProps> = ({
       case 'secondary':
         return colors.textSecondary;
       case 'tertiary':
-        return colors.textTertiary;
+        return colors.textMuted;
       case 'inverse':
-        return colors.textInverse;
+        return colors.text;
       case 'error':
         return colors.error;
       case 'success':
         return colors.success;
+      case 'info':
+        return colors.info;
       default:
         return colors.text;
     }
@@ -52,12 +56,32 @@ export const ThemedText: React.FC<ThemedTextProps> = ({
   const variantStyles =
     typography.variants[variant] || typography.variants.body1;
 
+  // Apply weight override if provided
+  const getFontFamily = () => {
+    if (weight) {
+      // Map weight to appropriate font family
+      switch (weight) {
+        case 'light':
+          return typography.families.interLight;
+        case 'regular':
+          return typography.families.interRegular;
+        case 'medium':
+          return typography.families.interMedium;
+        case 'bold':
+          return typography.families.interBold;
+        default:
+          return variantStyles.fontFamily;
+      }
+    }
+    return variantStyles.fontFamily;
+  };
+
   // Combine styles
   const textStyle = {
     ...variantStyles,
     color: getColor(),
     textAlign: align,
-    fontFamily: typography.families.regular,
+    fontFamily: getFontFamily(),
     ...(weight && { fontWeight: typography.weights[weight] }),
   };
 

@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+/* eslint-disable no-catch-shadow */
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
 import { DeviceRegisterRequest } from '../types/user.types';
@@ -41,25 +42,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   checkAuthStatus();
-  // }, []);
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
 
-  // const checkAuthStatus = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const token = await AsyncStorage.getItem('token');
-  //     if (token) {
-  //       console.log(api);
-
-  //       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  //     }
-  //   } catch (error) {
-  //     console.error('Auth check failed:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const checkAuthStatus = async () => {
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        api.defaults.headers.common.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const registerDevice = async (data: DeviceRegisterRequest) => {
     try {
